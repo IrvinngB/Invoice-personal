@@ -6,20 +6,60 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Bricolage Grotesque', sans-serif;
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+
+    /* Irvin's Brand Color Palette (from https://irvincodes.dev) */
+    --color-brand-dark: #071F1F;
+    --color-brand-surface: #0A2E2E;
+    --color-brand-container: #0D3A3A;
+    --color-brand-surface-high: #114444;
+    --color-brand-light-bg: #F4FAF0;
+    --color-brand-light-surface: #FFFFFF;
+    --color-brand-light-container: #EAF3E4;
+    --color-brand-light-high: #D6EACB;
+    --color-brand-primary: #2E7A42;
+    --color-brand-accent: #3FA35B;
+    --color-brand-lime: #B4D333;
+    --color-brand-citron: #BBD94E;
+
+    /* Remap Blue to Brand Emerald / Accent so all primary elements take Irvin's colors */
+    --color-blue-50: #F4FAF0;
+    --color-blue-100: #EAF3E4;
+    --color-blue-200: #D6EACB;
+    --color-blue-300: #A8D59A;
+    --color-blue-400: #5DAA62;
+    --color-blue-500: #3FA35B;
+    --color-blue-600: #2E7A42;
+    --color-blue-700: #246335;
+    --color-blue-800: #1C4D2A;
+    --color-blue-900: #0D3A3A;
+    --color-blue-950: #071F1F;
+
+    /* Remap Slate to Irvin's Dark Obsidian & Light Mint tints */
+    --color-slate-50: #F4FAF0;
+    --color-slate-100: #EAF3E4;
+    --color-slate-200: #D6EACB;
+    --color-slate-300: #BDD8C9;
+    --color-slate-400: #93B4A6;
+    --color-slate-500: #6B8579;
+    --color-slate-600: #4D6659;
+    --color-slate-700: #114444;
+    --color-slate-800: #0D3A3A;
+    --color-slate-900: #0A2E2E;
+    --color-slate-950: #071F1F;
 }
 
-:root {
-    --brand-accent: #3FA35B;
-    --brand-lime: #B4D333;
-    --brand-dark-teal: #071F1F;
+/* Custom visual polish */
+h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
 }
 
-.dark {
-    --tw-color-slate-950: #071F1F;
-    --tw-color-slate-900: #0A2E2E;
-    --tw-color-slate-800: #0D3A3A;
-    --tw-color-slate-700: #114444;
+.brand-glow {
+    box-shadow: 0 0 25px -5px rgba(63, 163, 91, 0.25);
 }
 
+.dark .brand-glow {
+    box-shadow: 0 0 30px -5px rgba(180, 211, 51, 0.2);
+}

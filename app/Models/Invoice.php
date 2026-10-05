@@ -111,6 +111,19 @@ class Invoice extends Model
             $amountPaid
         );
 
+        // Persist calculated financial fields back to each individual line item
+        foreach ($this->items as $index => $item) {
+            if (isset($result['items'][$index])) {
+                $itemCalc = $result['items'][$index];
+                $item->update([
+                    'subtotal_cents' => $itemCalc['subtotal_cents'],
+                    'discount_amount_cents' => $itemCalc['discount_amount_cents'],
+                    'tax_amount_cents' => $itemCalc['tax_amount_cents'],
+                    'total_cents' => $itemCalc['total_cents'],
+                ]);
+            }
+        }
+
         $newStatus = $calcService->determineStatus(
             $this->status ?? 'draft',
             $result['total_cents'],
