@@ -52,34 +52,44 @@
                     <!-- Desktop Nav Links -->
                     <nav class="hidden md:flex items-center space-x-1 pl-4 border-l border-slate-200 dark:border-slate-800">
                         <a href="{{ route('dashboard') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white' }}">
-                            Dashboard
+                            {{ __('app.dashboard') }}
                         </a>
                         <a href="{{ route('invoices.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('invoices.*') && !request()->routeIs('invoices.create') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white' }}">
-                            Invoices & Quotes
+                            {{ __('app.invoices_quotes') }}
                         </a>
                         <a href="{{ route('clients.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('clients.*') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white' }}">
-                            Clients
+                            {{ __('app.clients') }}
                         </a>
                         <a href="{{ route('catalog.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('catalog.*') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white' }}">
-                            Services Catalog
+                            {{ __('app.services_catalog') }}
                         </a>
                         <a href="{{ route('recurring.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('recurring.*') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white' }}">
-                            Recurring
+                            {{ __('app.recurring') }}
                         </a>
                         <a href="{{ route('settings.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('settings.*') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white' }}">
-                            Settings
+                            {{ __('app.settings') }}
                         </a>
                     </nav>
                 </div>
 
                 <!-- Right Action Bar -->
                 <div class="flex items-center space-x-3">
+                    <!-- Language Switcher -->
+                    <div class="flex items-center rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                        <a href="{{ route('locale.switch', 'en') }}" class="px-2 py-1 rounded-md transition {{ app()->getLocale() === 'en' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white' }}">
+                            EN
+                        </a>
+                        <a href="{{ route('locale.switch', 'es') }}" class="px-2 py-1 rounded-md transition {{ app()->getLocale() === 'es' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white' }}">
+                            ES
+                        </a>
+                    </div>
+
                     <!-- Quick Create Button -->
                     <a href="{{ route('invoices.create') }}" class="inline-flex items-center px-3.5 py-1.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 shadow-sm transition active:scale-95">
                         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                         </svg>
-                        <span>New Invoice</span>
+                        <span>{{ __('app.new_invoice') }}</span>
                     </a>
 
                     <!-- Dark mode toggle -->

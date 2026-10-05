@@ -6,10 +6,14 @@ use App\Http\Controllers\CatalogItemController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RecurringInvoiceController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
+
+// Localization Switcher
+Route::get('locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
 // Authentication
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
