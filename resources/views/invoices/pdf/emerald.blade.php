@@ -5,17 +5,21 @@
 
     // Format dates with Carbon localization
     $formattedIssueDate = $locale === 'es'
-        ? $invoice->issue_date->locale('es')->isoFormat('D [de] MMMM, Y')
+        ? $invoice->issue_date->locale('es')->isoFormat('D [de] MMMM [de] Y')
         : $invoice->issue_date->locale('en')->isoFormat('MMMM D, Y');
 
     $formattedDueDate = $invoice->due_date
-        ? ($locale === 'es' ? $invoice->due_date->locale('es')->isoFormat('D [de] MMMM, Y') : $invoice->due_date->locale('en')->isoFormat('MMMM D, Y'))
+        ? ($locale === 'es' ? $invoice->due_date->locale('es')->isoFormat('D [de] MMMM [de] Y') : $invoice->due_date->locale('en')->isoFormat('MMMM D, Y'))
         : null;
 
     $isQuote = ($invoice->type ?? 'invoice') === 'quote';
     $docTitle = $isQuote 
-        ? ($locale === 'es' ? 'Cotización No.' : 'Quote No.') 
-        : ($locale === 'es' ? 'Factura No.' : 'Invoice No.');
+        ? ($locale === 'es' ? 'Cotización de desarrollo web' : 'Web Development Quote') 
+        : ($locale === 'es' ? 'Factura de desarrollo web' : 'Web Development Invoice');
+
+    $formatMoney = function($cents) use ($invoice) {
+        return $invoice->currency . ' ' . number_format($cents / 100, 2, '.', ',');
+    };
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}">
@@ -29,389 +33,476 @@
         }
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 11px;
-            color: #071F1F;
+            font-size: 10.5px;
+            color: #111111;
             line-height: 1.45;
             background: #ffffff;
             margin: 0;
-            padding: 0;
+            padding: 38px 46px 40px 46px;
         }
 
-        /* Top Branded Bar (Emerald & Lime accent) */
-        .top-accent-wrapper {
-            width: 100%;
-            height: 12px;
-            background: #ffffff;
-            position: relative;
-        }
-        .top-bar-emerald {
-            height: 12px;
-            background-color: #2E7A42;
-            width: 48%;
-            margin-left: 52%;
-        }
-        .top-bar-lime {
-            position: absolute;
-            top: 10px;
-            right: 0;
-            width: 20%;
-            height: 3px;
-            background-color: #B4D333;
-        }
-
-        .page-content {
-            padding: 30px 48px 40px 48px;
-        }
-
-        /* Header Layout */
+        /* Top Header Grid */
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 22px;
-        }
-        .owner-title {
-            font-size: 21px;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            color: #071F1F;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-            line-height: 1.1;
-        }
-        .owner-id {
-            font-size: 15px;
-            font-weight: 700;
-            color: #2E7A42;
-            margin-bottom: 22px;
-            letter-spacing: 0.3px;
-        }
-
-        .client-section {
-            font-size: 11px;
-            line-height: 1.45;
-            color: #1a2e26;
-        }
-        .client-label {
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #4D6659;
-            margin-bottom: 4px;
-        }
-        .client-name {
-            font-weight: 800;
-            font-size: 12px;
-            color: #071F1F;
-            margin-bottom: 2px;
-        }
-
-        .meta-right {
-            text-align: right;
-            vertical-align: top;
-            font-size: 11px;
-            line-height: 1.45;
-            color: #334A3E;
+            margin-bottom: 30px;
         }
         .logo-box {
-            text-align: right;
-            margin-bottom: 12px;
+            text-align: left;
+            vertical-align: top;
+            width: 35%;
         }
         .logo-img {
-            max-height: 60px;
-            max-width: 140px;
+            max-height: 72px;
+            max-width: 160px;
         }
-        .invoice-title {
-            font-size: 14px;
+        .title-meta-box {
+            text-align: right;
+            vertical-align: top;
+            width: 65%;
+        }
+        .main-title {
+            font-size: 24px;
             font-weight: 800;
-            color: #071F1F;
-            margin-bottom: 4px;
-            letter-spacing: 0.2px;
+            color: #000000;
+            letter-spacing: -0.4px;
+            margin-bottom: 12px;
+            line-height: 1.1;
         }
-        .invoice-meta-date {
-            font-weight: 600;
-            color: #1F382E;
-            margin-bottom: 3px;
-        }
-        .invoice-meta-sub {
+        .meta-table {
+            float: right;
+            border-collapse: collapse;
             font-size: 10px;
-            color: #4D6659;
-            line-height: 1.4;
+        }
+        .meta-table td {
+            padding: 2.5px 0;
+            vertical-align: middle;
+        }
+        .meta-label {
+            color: #737373;
+            text-align: right;
+            padding-right: 20px;
+            white-space: nowrap;
+        }
+        .meta-value {
+            color: #000000;
+            font-weight: 700;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        /* Parties Grid (De / Cobrar a) */
+        .parties-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 32px;
+        }
+        .party-col-left {
+            width: 50%;
+            vertical-align: top;
+            text-align: left;
+            font-size: 10px;
+            line-height: 1.45;
+            color: #333333;
+        }
+        .party-col-right {
+            width: 50%;
+            vertical-align: top;
+            text-align: right;
+            font-size: 10px;
+            line-height: 1.45;
+            color: #333333;
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 5px;
+        }
+        .party-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: #000000;
+            margin-bottom: 5px;
+            line-height: 1.2;
         }
 
         /* Items Table */
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 18px;
-            margin-bottom: 0px;
+            margin-top: 8px;
+            margin-bottom: 26px;
         }
-        .items-table th {
+        .items-table thead th {
             background-color: #2E7A42;
             color: #ffffff;
-            font-size: 10px;
+            font-size: 8.5px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.7px;
-            padding: 10px 14px;
+            letter-spacing: 0.6px;
+            padding: 10px 12px;
             border: none;
         }
-        .items-table th.col-price {
-            background-color: #3FA35B;
-            text-align: right;
-        }
-        .items-table td {
-            padding: 12px 14px;
-            font-size: 11px;
+        .items-table tbody td {
+            padding: 11px 12px;
+            font-size: 10px;
             vertical-align: middle;
-            border-bottom: 1px solid #E2EFE0;
-            color: #071F1F;
+            color: #111111;
         }
-        .col-desc { width: 55%; text-align: left; }
-        .col-qty { width: 20%; text-align: center; font-variant-numeric: tabular-nums; }
-        .col-price { 
-            width: 25%; 
-            text-align: right; 
+        .row-shaded {
             background-color: #F4FAF0;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
+        }
+        .row-white {
+            background-color: #ffffff;
+        }
+        .col-desc { width: 38%; text-align: left; }
+        .col-rate { width: 14%; text-align: right; font-variant-numeric: tabular-nums; }
+        .col-qty { width: 11%; text-align: center; font-variant-numeric: tabular-nums; }
+        .col-tax { width: 11%; text-align: right; font-variant-numeric: tabular-nums; }
+        .col-disc { width: 11%; text-align: right; font-variant-numeric: tabular-nums; }
+        .col-amount { width: 15%; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        .item-title {
+            font-weight: 700;
+            color: #000000;
+            display: block;
+        }
+        .item-sub {
+            font-size: 8.5px;
+            color: #555555;
+            margin-top: 2px;
+            line-height: 1.35;
         }
 
-        /* Total Section */
-        .total-box {
+        /* Bottom Section Grid */
+        .bottom-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 6px;
-            border-top: 2px solid #2E7A42;
-            border-bottom: 3px solid #2E7A42;
-            background-color: #ffffff;
         }
-        .total-box td {
-            padding: 11px 14px;
+        .bottom-left-col {
+            width: 53%;
+            vertical-align: top;
+            padding-right: 28px;
+        }
+        .bottom-right-col {
+            width: 47%;
+            vertical-align: top;
+        }
+
+        .block-title {
             font-size: 11.5px;
             font-weight: 800;
+            color: #000000;
+            margin-bottom: 6px;
         }
-        .total-label {
-            width: 75%;
+        .info-row-label {
+            font-size: 10px;
+            color: #222222;
+        }
+        .info-row-val {
+            font-size: 10px;
+            color: #555555;
+            margin-bottom: 6px;
+        }
+
+        /* Financial Breakdown */
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .breakdown-table td {
+            padding: 3.5px 0;
+            vertical-align: middle;
+        }
+        .breakdown-label {
+            color: #222222;
             text-align: left;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
+        }
+        .breakdown-label.bold {
+            font-weight: 800;
+            color: #000000;
+            font-size: 10.5px;
+        }
+        .breakdown-value {
+            text-align: right;
+            color: #222222;
+            font-variant-numeric: tabular-nums;
+        }
+        .breakdown-value.bold {
+            font-weight: 800;
+            color: #000000;
+            font-size: 10.5px;
+        }
+
+        /* Balance Due Container */
+        .balance-container {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #EAF3E4;
+            border-radius: 3px;
+        }
+        .balance-container td {
+            padding: 9px 12px;
+            font-weight: 800;
             color: #071F1F;
         }
-        .total-amount {
-            width: 25%;
+        .balance-label {
+            font-size: 11.5px;
+            text-align: left;
+        }
+        .balance-amount {
+            font-size: 12.5px;
             text-align: right;
-            background-color: #EAF3E4;
-            color: #071F1F;
-            font-size: 13.5px;
             font-variant-numeric: tabular-nums;
         }
 
-        /* Payment Details Box */
-        .payment-box {
-            margin-top: 24px;
-            padding: 10px 14px;
-            background-color: #F4FAF0;
-            border-left: 3px solid #2E7A42;
-            border-radius: 2px;
-            font-size: 10px;
-            color: #1F382E;
-            line-height: 1.5;
+        /* Signature area */
+        .signature-box {
+            text-align: right;
+            margin-top: 22px;
+            padding-right: 8px;
         }
-        .payment-heading {
-            font-size: 9.5px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #2E7A42;
-            margin-bottom: 3px;
-        }
-
-        /* Notes & Terms */
-        .notes-section {
-            margin-top: 16px;
-            font-size: 10px;
-            color: #4D6659;
-            line-height: 1.4;
-            font-style: italic;
-        }
-
-        /* Footer / Contact */
-        .footer-section {
-            margin-top: 36px;
-            font-size: 10px;
-            color: #334A3E;
-            line-height: 1.6;
-        }
-        .footer-heading {
-            font-weight: 800;
-            text-transform: lowercase;
-            margin-bottom: 3px;
-            color: #071F1F;
-            letter-spacing: 0.3px;
-        }
-        .footer-link {
-            color: #1F382E;
-            text-decoration: underline;
-            display: block;
-        }
-        .footer-link-inline {
-            color: #1F382E;
-            text-decoration: none;
-            border-bottom: 1px dotted #2E7A42;
-        }
-
-        /* Bottom Accent Stripe */
-        .bottom-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 14px;
-            background-color: #2E7A42;
-        }
-        .bottom-sub-bar {
-            position: absolute;
-            bottom: 14px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: #B4D333;
+        .signature-img {
+            height: 48px;
+            width: auto;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
 
-<div class="top-accent-wrapper">
-    <div class="top-bar-emerald"></div>
-    <div class="top-bar-lime"></div>
-</div>
-
-<div class="page-content">
+    <!-- Header Section -->
     <table class="header-table">
         <tr>
-            <td style="width: 55%; vertical-align: top;">
-                <div class="owner-title">{{ $profile->owner_name ?: $profile->business_name }}</div>
-                @if($profile->tax_id)
-                    <div class="owner-id">{{ $profile->tax_id }}</div>
+            <td class="logo-box">
+                @if($profile->logo_path && file_exists(public_path($profile->logo_path)))
+                    <img src="{{ public_path($profile->logo_path) }}" class="logo-img" alt="Logo">
+                @elseif(file_exists(public_path('images/brand-ib.svg')))
+                    <img src="{{ public_path('images/brand-ib.svg') }}" style="height: 64px; width: auto;" alt="Logo">
+                @else
+                    <div style="font-size: 42px; font-weight: 900; line-height: 1; letter-spacing: -2px; color: #2E7A42;">
+                        i<span style="color: #B4D333;">B</span>
+                    </div>
                 @endif
-
-                <div class="client-section">
-                    <div class="client-label">{{ $locale === 'es' ? 'Facturar a' : 'Bill to' }}:</div>
-                    <div class="client-name">{{ $client->company ?: $client->name }}</div>
-                    @if($client->billing_address)
-                        <div>{!! nl2br(e($client->billing_address)) !!}</div>
-                    @endif
-                    @if($client->tax_id)
-                        <div>RUC: {{ $client->tax_id }}</div>
-                    @endif
-                </div>
             </td>
-            <td class="meta-right" style="width: 45%;">
-                <div class="logo-box">
-                    @if($profile->logo_path && file_exists(public_path($profile->logo_path)))
-                        <img src="{{ public_path($profile->logo_path) }}" class="logo-img" alt="Logo">
-                    @elseif(file_exists(public_path('images/brand-ib.svg')))
-                        <img src="{{ public_path('images/brand-ib.svg') }}" style="height: 48px; width: auto; display: inline-block;" alt="iB Logo">
-                    @else
-                        <!-- Vector iB Logo fallback -->
-                        <div style="display: inline-block; font-size: 34px; font-weight: 900; line-height: 1; letter-spacing: -2px;">
-                            <span style="color: #3FA35B;">i</span><span style="color: #2E7A42;">B</span>
-                        </div>
+            <td class="title-meta-box">
+                <div class="main-title">{{ $docTitle }}</div>
+                <table class="meta-table">
+                    <tr>
+                        <td class="meta-label">{{ $locale === 'es' ? 'Orden de compra número.:' : 'Purchase order no.:' }}</td>
+                        <td class="meta-value">{{ $invoice->invoice_number }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">{{ $locale === 'es' ? 'Fecha de orden:' : 'Order date:' }}</td>
+                        <td class="meta-value">{{ $formattedIssueDate }}</td>
+                    </tr>
+                    @if($formattedDueDate)
+                    <tr>
+                        <td class="meta-label">{{ $locale === 'es' ? 'Fecha de vencimiento:' : 'Due date:' }}</td>
+                        <td class="meta-value">{{ $formattedDueDate }}</td>
+                    </tr>
                     @endif
-                </div>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-                <div class="invoice-title">{{ $docTitle }} {{ $invoice->invoice_number }}</div>
-                <div class="invoice-meta-date">{{ $formattedIssueDate }}</div>
-                @if($formattedDueDate)
-                    <div class="invoice-meta-sub">{{ $locale === 'es' ? 'Vencimiento' : 'Due date' }}: {{ $formattedDueDate }}</div>
-                @endif
-                @if($profile->address)
-                    <div class="invoice-meta-sub">{!! nl2br(e($profile->address)) !!}</div>
+    <!-- Parties Section (De / Cobrar a) -->
+    <table class="parties-table">
+        <tr>
+            <!-- De (Sender) -->
+            <td class="party-col-left">
+                <div class="section-label">{{ $locale === 'es' ? 'De' : 'From' }}</div>
+                <div class="party-name">{{ $profile->business_name ?: $profile->owner_name }}</div>
+                @if($profile->owner_name && $profile->owner_name !== $profile->business_name)
+                    <div>{{ $profile->owner_name }}</div>
                 @endif
                 @if($profile->email)
-                    <div class="invoice-meta-sub" style="color: #2E7A42; font-weight: 600;">{{ $profile->email }}</div>
+                    <div>{{ $profile->email }}</div>
+                @endif
+                @if($profile->phone)
+                    <div>{{ $profile->phone }}</div>
+                @endif
+                @if($profile->website)
+                    <div>{{ str_replace(['https://', 'http://'], '', $profile->website) }}</div>
+                @endif
+                @if($profile->address)
+                    <div>{!! nl2br(e($profile->address)) !!}</div>
+                @endif
+                @if($profile->tax_id)
+                    <div>Cédula / RUC: {{ $profile->tax_id }}</div>
+                @endif
+            </td>
+
+            <!-- Cobrar a (Client) -->
+            <td class="party-col-right">
+                <div class="section-label">{{ $locale === 'es' ? 'Cobrar a' : 'Bill to' }}</div>
+                <div class="party-name">{{ $client->company ?: $client->name }}</div>
+                @if($client->company && $client->name)
+                    <div>{{ $client->name }}</div>
+                @endif
+                @if($client->email)
+                    <div>{{ $client->email }}</div>
+                @endif
+                @if($client->phone)
+                    <div>{{ $client->phone }}</div>
+                @endif
+                @if($client->billing_address)
+                    <div>{!! nl2br(e($client->billing_address)) !!}</div>
+                @endif
+                @if($client->tax_id)
+                    <div>RUC: {{ $client->tax_id }}</div>
+                @endif
+
+                @if($client->shipping_address)
+                    <div class="section-label" style="margin-top: 10px;">{{ $locale === 'es' ? 'Envie a' : 'Ship to' }}</div>
+                    <div>{!! nl2br(e($client->shipping_address)) !!}</div>
                 @endif
             </td>
         </tr>
     </table>
 
-    <!-- Line items -->
+    <!-- Line Items Table -->
     <table class="items-table">
         <thead>
             <tr>
                 <th class="col-desc">{{ $locale === 'es' ? 'DESCRIPCIÓN' : 'DESCRIPTION' }}</th>
-                <th class="col-qty">{{ $locale === 'es' ? 'CANTIDAD (HORAS)' : 'QUANTITY (HOURS)' }}</th>
-                <th class="col-price">{{ $locale === 'es' ? 'PRECIO' : 'AMOUNT' }}</th>
+                <th class="col-rate">{{ $locale === 'es' ? 'RATE, CADA' : 'RATE, EACH' }}</th>
+                <th class="col-qty">{{ $locale === 'es' ? 'CANTIDAD' : 'QUANTITY' }}</th>
+                <th class="col-tax">{{ $locale === 'es' ? 'FISCAL' : 'TAX' }}</th>
+                <th class="col-disc">{{ $locale === 'es' ? 'DESCT' : 'DISC' }}</th>
+                <th class="col-amount">{{ $locale === 'es' ? 'AMOUNT, CADA' : 'AMOUNT, EACH' }}</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($items as $item)
+            @foreach($items as $index => $item)
             @php
                 $qty = (float) $item->quantity;
-                $formattedQty = ($qty == (int)$qty) 
-                    ? str_pad((string)(int)$qty, 2, '0', STR_PAD_LEFT) 
-                    : rtrim(rtrim(number_format($qty, 2), '0'), '.');
+                $formattedQty = ($qty == (int)$qty) ? (string)(int)$qty : rtrim(rtrim(number_format($qty, 2), '0'), '.');
+                $rowClass = ($index % 2 === 0) ? 'row-white' : 'row-shaded';
+                $unitPrice = number_format($item->unit_price_cents / 100, 2, '.', ',');
+                $lineTotal = number_format($item->total_cents / 100, 2, '.', ',');
+                $taxPct = number_format(($item->tax_rate_bps ?? 0) / 100, 2) . '%';
+                $discPct = number_format(($item->discount_bps ?? 0) / 100, 2) . '%';
             @endphp
-            <tr>
-                <td class="col-desc">{{ $item->description }}</td>
+            <tr class="{{ $rowClass }}">
+                <td class="col-desc">
+                    <span class="item-title">{{ $item->description }}</span>
+                    @if($item->catalogItem && $item->catalogItem->description && $item->catalogItem->description !== $item->description)
+                        <div class="item-sub">{{ $item->catalogItem->description }}</div>
+                    @endif
+                </td>
+                <td class="col-rate">{{ $unitPrice }}</td>
                 <td class="col-qty">{{ $formattedQty }}</td>
-                <td class="col-price">{{ \App\Services\InvoiceCalculationService::formatMoney($item->total_cents, $invoice->currency, $locale) }}</td>
+                <td class="col-tax">{{ $taxPct }}</td>
+                <td class="col-disc">{{ $discPct }}</td>
+                <td class="col-amount">{{ $lineTotal }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
-    <!-- Total -->
-    <table class="total-box">
+    <!-- Bottom Section: Payment Instructions + Notes (Left) & Financial Breakdown + Signature (Right) -->
+    <table class="bottom-table">
         <tr>
-            <td class="total-label">{{ $locale === 'es' ? 'MONTO TOTAL:' : 'TOTAL AMOUNT:' }}</td>
-            <td class="total-amount">{{ \App\Services\InvoiceCalculationService::formatMoney($invoice->total_cents, $invoice->currency, $locale) }}</td>
+            <!-- Left Column: Instructions and Notes -->
+            <td class="bottom-left-col">
+                <div class="block-title">{{ $locale === 'es' ? 'Instrucciones de pago' : 'Payment Instructions' }}</div>
+
+                @if($profile->paypal_email)
+                    <div class="info-row-label">E-mail de Paypal</div>
+                    <div class="info-row-val">{{ $profile->paypal_email }}</div>
+                @endif
+
+                @if($profile->bank_account_name || $profile->owner_name)
+                    <div class="info-row-label">{{ $locale === 'es' ? 'Cheques a nombre de' : 'Checks payable to' }}</div>
+                    <div class="info-row-val">{{ $profile->bank_account_name ?: $profile->owner_name }}</div>
+                @endif
+
+                @if($profile->bank_name || $profile->bank_iban)
+                    <div class="info-row-label">{{ $locale === 'es' ? 'Transferencia bancaria' : 'Bank Transfer' }}</div>
+                    <div class="info-row-val">
+                        @if($profile->bank_name)
+                            {{ $profile->bank_name }}<br>
+                        @endif
+                        @if($profile->bank_iban)
+                            {{ $locale === 'es' ? 'Cuenta / Cédula ACH:' : 'Account / IBAN:' }} {{ $profile->bank_iban }}<br>
+                        @endif
+                        @if($profile->bank_swift)
+                            {{ $locale === 'es' ? 'Enrutamiento (ABA/SWIFT):' : 'Routing (ABA/SWIFT):' }} {{ $profile->bank_swift }}
+                        @endif
+                    </div>
+                @endif
+
+                @if($invoice->payment_instructions)
+                    <div class="info-row-val" style="margin-top: 4px;">
+                        {!! nl2br(e($invoice->payment_instructions)) !!}
+                    </div>
+                @endif
+
+                @if($invoice->notes || $profile->default_notes)
+                    <div class="block-title" style="margin-top: 14px;">{{ $locale === 'es' ? 'Notas' : 'Notes' }}</div>
+                    <div class="info-row-val" style="line-height: 1.45;">
+                        {!! nl2br(e($invoice->notes ?: $profile->default_notes)) !!}
+                    </div>
+                @endif
+            </td>
+
+            <!-- Right Column: Financial Totals Breakdown -->
+            <td class="bottom-right-col">
+                <table class="breakdown-table">
+                    <tr>
+                        <td class="breakdown-label bold">{{ $locale === 'es' ? 'Total parcial:' : 'Subtotal:' }}</td>
+                        <td class="breakdown-value bold">{{ $formatMoney($invoice->subtotal_cents) }}</td>
+                    </tr>
+                    @if($invoice->discount_total_cents > 0)
+                    <tr>
+                        <td class="breakdown-label">{{ $locale === 'es' ? 'Descuento:' : 'Discount:' }}</td>
+                        <td class="breakdown-value">-{{ $formatMoney($invoice->discount_total_cents) }}</td>
+                    </tr>
+                    @endif
+                    @if($invoice->shipping_fee_cents > 0)
+                    <tr>
+                        <td class="breakdown-label">{{ $locale === 'es' ? 'Costo de envío:' : 'Shipping fee:' }}</td>
+                        <td class="breakdown-value">{{ $formatMoney($invoice->shipping_fee_cents) }}</td>
+                    </tr>
+                    @endif
+                    <tr>
+                        <td class="breakdown-label">{{ $locale === 'es' ? 'Impuesto de venta:' : 'Sales tax:' }}</td>
+                        <td class="breakdown-value">{{ $formatMoney($invoice->tax_total_cents) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="breakdown-label bold" style="padding-top: 6px;">{{ $locale === 'es' ? 'Total:' : 'Total:' }}</td>
+                        <td class="breakdown-value bold" style="padding-top: 6px; font-size: 11.5px;">{{ $formatMoney($invoice->total_cents) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="breakdown-label">{{ $locale === 'es' ? 'Cantidad pagada:' : 'Amount paid:' }}</td>
+                        <td class="breakdown-value">{{ $formatMoney($invoice->amount_paid_cents) }}</td>
+                    </tr>
+                </table>
+
+                <!-- Balance Due Box -->
+                <table class="balance-container">
+                    <tr>
+                        <td class="balance-label">{{ $locale === 'es' ? 'Saldo adeudado:' : 'Balance due:' }}</td>
+                        <td class="balance-amount">{{ $formatMoney($invoice->balance_cents) }}</td>
+                    </tr>
+                </table>
+
+                <!-- Handwritten Signature Flourish -->
+                @if(file_exists(public_path('images/signature-accent.svg')))
+                <div class="signature-box">
+                    <img src="{{ public_path('images/signature-accent.svg') }}" class="signature-img" alt="Signature">
+                </div>
+                @endif
+            </td>
         </tr>
     </table>
-
-    <!-- Payment details if available -->
-    @if($profile->bank_name || $profile->bank_iban || $profile->paypal_email)
-    <div class="payment-box">
-        <div class="payment-heading">{{ $locale === 'es' ? 'Datos de pago / transferencia' : 'Payment Details' }}:</div>
-        @if($profile->bank_name)
-            <div><strong>{{ $locale === 'es' ? 'Banco' : 'Bank' }}:</strong> {{ $profile->bank_name }} @if($profile->bank_account_name)· {{ $profile->bank_account_name }}@endif</div>
-        @endif
-        @if($profile->bank_iban)
-            <div><strong>{{ $locale === 'es' ? 'Cuenta / Cédula ACH' : 'Account / IBAN' }}:</strong> {{ $profile->bank_iban }}</div>
-        @endif
-        @if($profile->paypal_email)
-            <div><strong>PayPal:</strong> {{ $profile->paypal_email }}</div>
-        @endif
-    </div>
-    @endif
-
-    <!-- Notes if available -->
-    @if($invoice->notes)
-        <div class="notes-section">
-            {{ $invoice->notes }}
-        </div>
-    @endif
-
-    <!-- Contact links -->
-    <div class="footer-section">
-        <div class="footer-heading">{{ $locale === 'es' ? 'contacto:' : 'contact:' }}</div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 3px;">
-            <tr>
-                <td style="font-size: 10px; color: #1F382E; padding: 0;">
-                    <a href="{{ $profile->website ?: 'https://irvincodes.dev' }}" class="footer-link-inline"><strong>Web:</strong> {{ str_replace(['https://', 'http://'], '', $profile->website ?: 'https://irvincodes.dev') }}</a>
-                    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-                    <a href="https://github.com/IrvinngB" class="footer-link-inline"><strong>GitHub:</strong> github.com/IrvinngB</a>
-                    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-                    <a href="https://www.linkedin.com/in/irvin-benitez-11313231b/" class="footer-link-inline"><strong>LinkedIn:</strong> linkedin.com/in/irvin-benitez</a>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
-
-<div class="bottom-sub-bar"></div>
-<div class="bottom-bar"></div>
 
 </body>
 </html>

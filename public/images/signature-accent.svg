@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="60" viewBox="0 0 160 60" fill="none">
+    <!-- Cursive fluid signature stroke -->
+    <path d="M18 42C12 36 10 24 22 15C32 7 36 28 42 36C46 41 38 48 30 46C20 44 26 22 52 24C68 25 76 18 84 14C92 10 98 16 94 26C88 40 76 34 88 28C98 23 108 18 122 15C136 12 148 10 152 8" stroke="#2E7A42" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M48 30C62 28 82 26 102 22" stroke="#2E7A42" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M72 38C85 36 106 32 118 29" stroke="#2E7A42" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
