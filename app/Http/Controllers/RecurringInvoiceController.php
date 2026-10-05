@@ -82,6 +82,11 @@ class RecurringInvoiceController extends Controller
     public function generateNow(RecurringInvoice $recurring)
     {
         $invoice = $recurring->generateInvoice();
+        if (!$invoice) {
+            return redirect()->route('recurring.index')
+                ->with('error', "Ya existe una factura activa emitida para {$recurring->client->name} en esa fecha. Se evitó la duplicación automática.");
+        }
+
         return redirect()->route('invoices.show', $invoice)
             ->with('success', "Invoice {$invoice->invoice_number} successfully generated from recurring schedule.");
     }

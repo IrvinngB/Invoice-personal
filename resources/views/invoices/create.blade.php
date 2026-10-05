@@ -12,6 +12,9 @@
     defaultNotes: {{ Js::from($profile->default_notes) }},
     defaultFooter: {{ Js::from($profile->default_footer) }},
     defaultPaymentInstructions: {{ Js::from($profile->bank_iban ? "Bank: {$profile->bank_name}\nIBAN: {$profile->bank_iban}\nSWIFT: {$profile->bank_swift}" : '') }},
+    defaultTemplate: '{{ $profile->default_template ?: "modern" }}',
+    defaultPageSize: '{{ $profile->default_page_size ?: "letter" }}',
+    defaultLocale: '{{ $profile->default_locale ?: "es" }}',
     initialClientId: '{{ $selectedClientId ?: '' }}',
     sourceInvoice: {{ Js::from($sourceInvoice) }}
 })" class="space-y-6">
@@ -59,7 +62,41 @@
 
                 <!-- Client & Dates Card -->
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Recipient & Schedule</h3>
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Recipient & Numbering</h3>
+                    </div>
+
+                    <!-- Custom / Continuing Invoice Number -->
+                    <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            Número del Documento
+                            <span class="text-[11px] font-normal text-slate-500 dark:text-slate-400">(Editable: continuá tu serie anterior o dejá el automático)</span>
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" name="invoice_number" value="{{ old('invoice_number', $previewNumber) }}"
+                                placeholder="{{ $previewNumber }}"
+                                class="w-full px-3 py-2 text-xs font-mono font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400">
+                            Podés ingresar por ej. <strong class="font-mono text-slate-700 dark:text-slate-200">00009</strong> o <strong class="font-mono text-slate-700 dark:text-slate-200">Factura No. 00009</strong>. Las próximas facturas continuarán la correlación automáticamente desde este número.
+                        </p>
+                    </div>
+
+                    @if($errors->has('client_id'))
+                        <div class="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-200 space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span class="font-medium">{{ $errors->first('client_id') }}</span>
+                            </div>
+                            <label class="inline-flex items-center text-xs font-bold text-amber-900 dark:text-amber-100 cursor-pointer pt-1">
+                                <input type="checkbox" name="allow_duplicate" value="1" {{ old('allow_duplicate') ? 'checked' : '' }}
+                                    class="rounded border-amber-400 text-amber-600 focus:ring-amber-500 mr-2">
+                                <span>Confirmar y permitir emitir factura adicional para este cliente en esta fecha</span>
+                            </label>
+                        </div>
+                    @endif
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Client Selection -->
@@ -299,6 +336,7 @@
                             <label class="block text-[10px] font-semibold text-slate-500 mb-1">PDF Template</label>
                             <select name="pdf_template" x-model="form.pdf_template" class="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                 <option value="modern">Modern (Default)</option>
+                                <option value="emerald">Emerald (Irvin Benitez Style)</option>
                                 <option value="classic">Classic Formal</option>
                                 <option value="minimal">Minimalist</option>
                             </select>
@@ -360,9 +398,9 @@ function invoiceBuilder(config) {
             notes: config.defaultNotes || '',
             payment_terms: config.defaultFooter || '',
             payment_link: '',
-            pdf_template: 'modern',
-            page_size: 'a4',
-            locale: 'en'
+            pdf_template: config.defaultTemplate || 'modern',
+            page_size: config.defaultPageSize || 'letter',
+            locale: config.defaultLocale || 'es'
         },
         items: [
             { key: 1, description: '', quantity: 1, unit: 'hours', unit_price: 0, discount_percent: 0, tax_rate_percent: 0 }

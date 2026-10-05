@@ -141,8 +141,8 @@
                 <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Invoices Sequence</span>
                     <div>
-                        <label class="block text-[10px] text-slate-400">Prefix</label>
-                        <input type="text" name="invoice_prefix" value="{{ old('invoice_prefix', $profile->invoice_prefix) }}" required
+                        <label class="block text-[10px] text-slate-400">Prefix (Optional)</label>
+                        <input type="text" name="invoice_prefix" value="{{ old('invoice_prefix', $profile->invoice_prefix) }}"
                             class="w-full px-2 py-1 text-xs rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -163,8 +163,8 @@
                 <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Quotes Sequence</span>
                     <div>
-                        <label class="block text-[10px] text-slate-400">Prefix</label>
-                        <input type="text" name="quote_prefix" value="{{ old('quote_prefix', $profile->quote_prefix) }}" required
+                        <label class="block text-[10px] text-slate-400">Prefix (Optional)</label>
+                        <input type="text" name="quote_prefix" value="{{ old('quote_prefix', $profile->quote_prefix) }}"
                             class="w-full px-2 py-1 text-xs rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -185,8 +185,8 @@
                 <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Credit Notes</span>
                     <div>
-                        <label class="block text-[10px] text-slate-400">Prefix</label>
-                        <input type="text" name="credit_note_prefix" value="{{ old('credit_note_prefix', $profile->credit_note_prefix) }}" required
+                        <label class="block text-[10px] text-slate-400">Prefix (Optional)</label>
+                        <input type="text" name="credit_note_prefix" value="{{ old('credit_note_prefix', $profile->credit_note_prefix) }}"
                             class="w-full px-2 py-1 text-xs rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -205,7 +205,7 @@
             </div>
 
             <!-- Document Render Defaults -->
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 pt-2">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Default Currency</label>
                     <input type="text" name="default_currency" maxlength="3" value="{{ old('default_currency', $profile->default_currency) }}" required
@@ -220,6 +220,7 @@
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">PDF Template</label>
                     <select name="default_template" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                         <option value="modern" {{ old('default_template', $profile->default_template) === 'modern' ? 'selected' : '' }}>Modern</option>
+                        <option value="emerald" {{ old('default_template', $profile->default_template) === 'emerald' ? 'selected' : '' }}>Emerald (Irvin Benitez Style)</option>
                         <option value="classic" {{ old('default_template', $profile->default_template) === 'classic' ? 'selected' : '' }}>Classic Formal</option>
                         <option value="minimal" {{ old('default_template', $profile->default_template) === 'minimal' ? 'selected' : '' }}>Minimalist</option>
                     </select>
@@ -229,6 +230,13 @@
                     <select name="default_page_size" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                         <option value="a4" {{ old('default_page_size', $profile->default_page_size) === 'a4' ? 'selected' : '' }}>A4</option>
                         <option value="letter" {{ old('default_page_size', $profile->default_page_size) === 'letter' ? 'selected' : '' }}>US Letter</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Default Language</label>
+                    <select name="default_locale" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
+                        <option value="es" {{ old('default_locale', $profile->default_locale) === 'es' ? 'selected' : '' }}>Español (ES)</option>
+                        <option value="en" {{ old('default_locale', $profile->default_locale) === 'en' ? 'selected' : '' }}>English (EN)</option>
                     </select>
                 </div>
             </div>

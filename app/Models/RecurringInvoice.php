@@ -56,13 +56,27 @@ class RecurringInvoice extends Model
     /**
      * Generate actual draft invoice from this recurring template.
      */
-    public function generateInvoice(): Invoice
+    public function generateInvoice(bool $force = false): ?Invoice
     {
-        return DB::transaction(function () {
+        $issueDate = $this->next_issue_date->toDateString();
+
+        if (!$force) {
+            $alreadyExists = Invoice::where('client_id', $this->client_id)
+                ->where('type', 'invoice')
+                ->whereDate('issue_date', $issueDate)
+                ->where('status', '!=', 'void')
+                ->exists();
+
+            if ($alreadyExists) {
+                $this->advanceNextIssueDate();
+                return null;
+            }
+        }
+
+        return DB::transaction(function () use ($issueDate) {
             $profile = BusinessProfile::current();
             $payload = $this->template_payload ?? [];
 
-            $issueDate = $this->next_issue_date->toDateString();
             $dueDate = $this->next_issue_date->copy()->addDays($this->payment_terms_days ?: $profile->default_payment_terms_days)->toDateString();
 
             $invoice = Invoice::create([

@@ -158,4 +158,230 @@ class InvoiceWorkflowTest extends TestCase
         $this->artisan('invoices:generate-recurring')->assertSuccessful();
         $this->assertEquals(3, Invoice::count());
     }
+
+    public function test_duplicate_invoice_guard_for_same_client(): void
+    {
+        $client = Client::create([
+            'name' => 'Demo Client',
+            'company' => 'Acme Demo Solutions LLC',
+            'tax_id' => 'DEMO-123456-2026',
+        ]);
+
+        $today = now()->toDateString();
+
+        // Create first invoice
+        $this->post(route('invoices.store'), [
+            'client_id' => $client->id,
+            'type' => 'invoice',
+            'issue_date' => $today,
+            'due_date' => now()->addDays(15)->toDateString(),
+            'currency' => 'USD',
+            'pdf_template' => 'emerald',
+            'page_size' => 'letter',
+            'locale' => 'es',
+            'items' => [
+                [
+                    'description' => 'Servicios de soporte.',
+                    'quantity' => 5,
+                    'unit' => 'horas',
+                    'unit_price' => 10.00,
+                ]
+            ]
+        ])->assertSessionHasNoErrors();
+
+        $this->assertEquals(1, Invoice::count());
+
+        // Attempt duplicate invoice for same client on same date without confirmation -> must fail
+        $duplicateAttempt = $this->post(route('invoices.store'), [
+            'client_id' => $client->id,
+            'type' => 'invoice',
+            'issue_date' => $today,
+            'due_date' => now()->addDays(15)->toDateString(),
+            'currency' => 'USD',
+            'pdf_template' => 'emerald',
+            'page_size' => 'letter',
+            'locale' => 'es',
+            'items' => [
+                [
+                    'description' => 'Servicios de soporte.',
+                    'quantity' => 5,
+                    'unit' => 'horas',
+                    'unit_price' => 10.00,
+                ]
+            ]
+        ]);
+
+        $duplicateAttempt->assertSessionHasErrors(['client_id']);
+        $this->assertEquals(1, Invoice::count());
+
+        // Attempt duplicate invoice WITH allow_duplicate confirmation -> must succeed
+        $confirmedAttempt = $this->post(route('invoices.store'), [
+            'client_id' => $client->id,
+            'type' => 'invoice',
+            'issue_date' => $today,
+            'due_date' => now()->addDays(15)->toDateString(),
+            'currency' => 'USD',
+            'pdf_template' => 'emerald',
+            'page_size' => 'letter',
+            'locale' => 'es',
+            'allow_duplicate' => 1,
+            'items' => [
+                [
+                    'description' => 'Servicios adicionales.',
+                    'quantity' => 2,
+                    'unit' => 'horas',
+                    'unit_price' => 10.00,
+                ]
+            ]
+        ]);
+
+        $confirmedAttempt->assertSessionHasNoErrors();
+        $this->assertEquals(2, Invoice::count());
+    }
+
+    public function test_custom_invoice_number_sequence_continuation(): void
+    {
+        $client = Client::create([
+            'name' => 'Custom Sequence Client',
+            'email' => 'client@test.com',
+        ]);
+
+        $profile = BusinessProfile::current();
+        $profile->update([
+            'invoice_prefix' => '',
+            'invoice_number_digits' => 5,
+            'next_invoice_number' => 1,
+        ]);
+
+        // 1. Manually continue sequence starting at 00008 (from previous generator)
+        $res = $this->post(route('invoices.store'), [
+            'client_id' => $client->id,
+            'invoice_number' => '00008',
+            'type' => 'invoice',
+            'issue_date' => '2026-09-30',
+            'due_date' => '2026-10-15',
+            'currency' => 'USD',
+            'pdf_template' => 'emerald',
+            'page_size' => 'letter',
+            'locale' => 'es',
+            'items' => [
+                [
+                    'description' => 'Servicios de soporte.',
+                    'quantity' => 5,
+                    'unit' => 'horas',
+                    'unit_price' => 10.00,
+                ]
+            ]
+        ]);
+
+        $res->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('invoices', ['invoice_number' => '00008']);
+
+        // Profile next invoice number should have automatically synced to 9!
+        $this->assertEquals(9, $profile->fresh()->next_invoice_number);
+
+        // 2. Next invoice without specifying invoice_number should automatically be 00009
+        $res2 = $this->post(route('invoices.store'), [
+            'client_id' => $client->id,
+            'type' => 'invoice',
+            'issue_date' => '2026-10-01',
+            'due_date' => '2026-10-15',
+            'currency' => 'USD',
+            'pdf_template' => 'emerald',
+            'page_size' => 'letter',
+            'locale' => 'es',
+            'items' => [
+                [
+                    'description' => 'Servicios de soporte mes siguiente.',
+                    'quantity' => 5,
+                    'unit' => 'horas',
+                    'unit_price' => 10.00,
+                ]
+            ]
+        ]);
+
+        $res2->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('invoices', ['invoice_number' => '00009']);
+        $this->assertEquals(10, $profile->fresh()->next_invoice_number);
+    }
+
+    public function test_emerald_pdf_template_renders_properly(): void
+    {
+        $client = Client::create([
+            'name' => 'Demo Client Corp',
+            'company' => 'Acme Demo Solutions LLC',
+            'tax_id' => 'DEMO-123456-2026',
+            'billing_address' => "Demo Avenue 100\nCity",
+        ]);
+
+        $invoice = Invoice::create([
+            'invoice_number' => '00008',
+            'type' => 'invoice',
+            'status' => 'paid',
+            'client_id' => $client->id,
+            'issue_date' => '2026-09-30',
+            'due_date' => '2026-10-15',
+            'currency' => 'USD',
+            'pdf_template' => 'emerald',
+            'page_size' => 'letter',
+            'locale' => 'es',
+        ]);
+
+        $invoice->items()->create([
+            'description' => 'Servicios de soporte.',
+            'quantity' => 5,
+            'unit' => 'horas',
+            'unit_price_cents' => 1000,
+            'total_cents' => 5000,
+        ]);
+        $invoice->recalculateTotals();
+
+        $response = $this->get(route('invoices.pdf', $invoice));
+        $response->assertStatus(200);
+        $this->assertEquals('application/pdf', $response->headers->get('content-type'));
+    }
+
+    public function test_settings_update_handles_default_locale(): void
+    {
+        $profile = BusinessProfile::current();
+
+        $response = $this->put(route('settings.update'), [
+            'business_name' => 'Studio Test Name',
+            'owner_name' => 'Consultant Name',
+            'default_currency' => 'USD',
+            'default_payment_terms_days' => 15,
+            'invoice_number_digits' => 5,
+            'next_invoice_number' => 9,
+            'quote_number_digits' => 5,
+            'next_quote_number' => 1,
+            'credit_note_number_digits' => 5,
+            'next_credit_note_number' => 1,
+            'default_template' => 'emerald',
+            'default_page_size' => 'letter',
+            'default_locale' => 'es',
+            'timezone' => 'America/Panama',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->assertEquals('es', $profile->fresh()->default_locale);
+
+        // Also test omitting default_locale -> should fallback gracefully without error
+        $response2 = $this->put(route('settings.update'), [
+            'business_name' => 'Studio Test Name',
+            'default_currency' => 'USD',
+            'default_payment_terms_days' => 15,
+            'invoice_number_digits' => 5,
+            'next_invoice_number' => 9,
+            'quote_number_digits' => 5,
+            'next_quote_number' => 1,
+            'credit_note_number_digits' => 5,
+            'next_credit_note_number' => 1,
+            'default_template' => 'emerald',
+            'default_page_size' => 'letter',
+            'timezone' => 'America/Panama',
+        ]);
+
+        $response2->assertSessionHasNoErrors();
+        $this->assertEquals('es', $profile->fresh()->default_locale);
+    }
 }

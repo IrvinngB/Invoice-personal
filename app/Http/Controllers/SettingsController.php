@@ -37,18 +37,18 @@ class SettingsController extends Controller
             'bank_swift' => 'nullable|string|max:50',
             'paypal_email' => 'nullable|email|max:255',
             'payment_link' => 'nullable|url|max:255',
-            'invoice_prefix' => 'required|string|max:20',
+            'invoice_prefix' => 'nullable|string|max:20',
             'invoice_number_digits' => 'required|integer|min:1|max:10',
             'next_invoice_number' => 'required|integer|min:1',
-            'quote_prefix' => 'required|string|max:20',
+            'quote_prefix' => 'nullable|string|max:20',
             'quote_number_digits' => 'required|integer|min:1|max:10',
             'next_quote_number' => 'required|integer|min:1',
-            'credit_note_prefix' => 'required|string|max:20',
+            'credit_note_prefix' => 'nullable|string|max:20',
             'credit_note_number_digits' => 'required|integer|min:1|max:10',
             'next_credit_note_number' => 'required|integer|min:1',
-            'default_template' => 'required|in:modern,classic,minimal',
+            'default_template' => 'required|in:modern,classic,minimal,emerald',
             'default_page_size' => 'required|in:a4,letter',
-            'default_locale' => 'required|in:en,es',
+            'default_locale' => 'nullable|in:en,es',
             'timezone' => 'required|string|timezone',
         ]);
 
@@ -65,6 +65,7 @@ class SettingsController extends Controller
         }
 
         $validated['default_currency'] = strtoupper($validated['default_currency']);
+        $validated['default_locale'] = $validated['default_locale'] ?? $profile->default_locale ?? 'es';
         $validated['default_tax_rate_bps'] = isset($validated['default_tax_rate_percent']) ? (int) round($validated['default_tax_rate_percent'] * 100) : 0;
         $validated['default_tax_inclusive'] = $request->boolean('default_tax_inclusive', false);
 

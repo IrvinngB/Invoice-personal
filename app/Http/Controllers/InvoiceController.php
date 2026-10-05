@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class InvoiceController extends Controller
 {
@@ -83,6 +84,7 @@ class InvoiceController extends Controller
     {
         $request->validate([
             'client_id' => 'required|exists:clients,id',
+            'invoice_number' => 'nullable|string|max:50|unique:invoices,invoice_number',
             'type' => 'required|in:invoice,quote,credit_note',
             'issue_date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issue_date',
@@ -94,7 +96,7 @@ class InvoiceController extends Controller
             'payment_terms' => 'nullable|string',
             'payment_instructions' => 'nullable|string',
             'payment_link' => 'nullable|url',
-            'pdf_template' => 'required|in:modern,classic,minimal',
+            'pdf_template' => 'required|in:modern,classic,minimal,emerald',
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
             'items' => 'required|array|min:1',
@@ -107,15 +109,62 @@ class InvoiceController extends Controller
             'items.*.tax_name' => 'nullable|string',
         ]);
 
+        // Anti-duplicate protection: prevent duplicate invoices for the same client on the same date unless explicitly authorized
+        if ($request->type === 'invoice' && !$request->boolean('allow_duplicate', false)) {
+            $existingInvoice = Invoice::where('client_id', $request->client_id)
+                ->where('type', 'invoice')
+                ->whereDate('issue_date', $request->issue_date)
+                ->where('status', '!=', 'void')
+                ->first();
+
+            if ($existingInvoice) {
+                throw ValidationException::withMessages([
+                    'client_id' => "Ya existe una factura activa ({$existingInvoice->invoice_number}) emitida para este cliente en la misma fecha ({$request->issue_date}). Si deseas emitir una factura adicional para este cliente en esta fecha, confirma marcando la casilla correspondiente.",
+                ]);
+            }
+        }
+
         $profile = BusinessProfile::current();
 
         $invoice = DB::transaction(function () use ($request, $profile) {
             $type = $request->type;
-            $invoiceNumber = match ($type) {
-                'quote' => $profile->generateNextQuoteNumber(),
-                'credit_note' => $profile->generateNextCreditNoteNumber(),
-                default => $profile->generateNextInvoiceNumber(),
-            };
+
+            if ($request->filled('invoice_number')) {
+                $invoiceNumber = trim($request->invoice_number);
+
+                // Auto-advance sequence and sync prefix/digits if user supplied a custom starting number
+                if (preg_match('/^(.*?)(\d+)$/', $invoiceNumber, $matches)) {
+                    $prefix = $matches[1];
+                    $numericPart = (int) $matches[2];
+                    $digits = strlen($matches[2]);
+
+                    if ($type === 'quote') {
+                        $profile->update([
+                            'next_quote_number' => $numericPart + 1,
+                            'quote_prefix' => $prefix,
+                            'quote_number_digits' => max($digits, $profile->quote_number_digits),
+                        ]);
+                    } elseif ($type === 'credit_note') {
+                        $profile->update([
+                            'next_credit_note_number' => $numericPart + 1,
+                            'credit_note_prefix' => $prefix,
+                            'credit_note_number_digits' => max($digits, $profile->credit_note_number_digits),
+                        ]);
+                    } else {
+                        $profile->update([
+                            'next_invoice_number' => $numericPart + 1,
+                            'invoice_prefix' => $prefix,
+                            'invoice_number_digits' => max($digits, $profile->invoice_number_digits),
+                        ]);
+                    }
+                }
+            } else {
+                $invoiceNumber = match ($type) {
+                    'quote' => $profile->generateNextQuoteNumber(),
+                    'credit_note' => $profile->generateNextCreditNoteNumber(),
+                    default => $profile->generateNextInvoiceNumber(),
+                };
+            }
 
             $invoice = Invoice::create([
                 'invoice_number' => $invoiceNumber,
@@ -206,7 +255,7 @@ class InvoiceController extends Controller
             'payment_terms' => 'nullable|string',
             'payment_instructions' => 'nullable|string',
             'payment_link' => 'nullable|url',
-            'pdf_template' => 'required|in:modern,classic,minimal',
+            'pdf_template' => 'required|in:modern,classic,minimal,emerald',
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
             'items' => 'required|array|min:1',

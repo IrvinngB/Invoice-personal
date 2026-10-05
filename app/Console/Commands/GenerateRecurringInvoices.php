@@ -20,8 +20,12 @@ class GenerateRecurringInvoices extends Command
         $count = 0;
         foreach ($dueRecurring as $recurring) {
             $invoice = $recurring->generateInvoice();
-            $this->info("Generated {$invoice->invoice_number} for client ID {$recurring->client_id}");
-            $count++;
+            if ($invoice) {
+                $this->info("Generated {$invoice->invoice_number} for client ID {$recurring->client_id}");
+                $count++;
+            } else {
+                $this->warn("Skipped recurring invoice for client ID {$recurring->client_id} (active invoice already exists for date).");
+            }
         }
 
         $this->info("Completed. {$count} recurring invoices generated.");

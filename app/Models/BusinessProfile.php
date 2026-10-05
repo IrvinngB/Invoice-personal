@@ -71,7 +71,7 @@ class BusinessProfile extends Model
     {
         $num = $this->next_invoice_number;
         $this->increment('next_invoice_number');
-        return $this->invoice_prefix . str_pad((string) $num, $this->invoice_number_digits, '0', STR_PAD_LEFT);
+        return ($this->invoice_prefix ?? '') . str_pad((string) $num, $this->invoice_number_digits, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -81,7 +81,7 @@ class BusinessProfile extends Model
     {
         $num = $this->next_quote_number;
         $this->increment('next_quote_number');
-        return $this->quote_prefix . str_pad((string) $num, $this->quote_number_digits, '0', STR_PAD_LEFT);
+        return ($this->quote_prefix ?? '') . str_pad((string) $num, $this->quote_number_digits, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -91,6 +91,6 @@ class BusinessProfile extends Model
     {
         $num = $this->next_credit_note_number;
         $this->increment('next_credit_note_number');
-        return $this->credit_note_prefix . str_pad((string) $num, $this->credit_note_number_digits, '0', STR_PAD_LEFT);
+        return ($this->credit_note_prefix ?? '') . str_pad((string) $num, $this->credit_note_number_digits, '0', STR_PAD_LEFT);
     }
 }

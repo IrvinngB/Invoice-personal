@@ -18,34 +18,39 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Invoices') - Personal Invoice Studio</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         [x-cloak] { display: none !important; }
+        .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-200">
+<body class="bg-slate-50 text-slate-800 dark:bg-[#071F1F] dark:text-[#E8F5F0] min-h-screen font-sans antialiased transition-colors duration-200">
 
     <!-- Top Navigation -->
-    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-[#0A2E2E]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Brand / Logo -->
                 <div class="flex items-center space-x-6">
                     <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <div class="h-10 w-10 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+                            <svg viewBox="15 14 70 70" class="h-9 w-auto" role="img" aria-label="Irvin Benitez">
+                                <circle cx="27" cy="28" r="8" fill="#BBD94E"/>
+                                <rect x="20" y="44" width="14" height="36" rx="7" fill="#3FA35B"/>
+                                <rect x="44" y="18" width="14" height="62" rx="7" fill="#3FA35B"/>
+                                <path fill-rule="evenodd" d="M44 62a18 18 0 1 0 36 0a18 18 0 1 0-36 0ZM55 62a7 7 0 1 0 14 0a7 7 0 1 0-14 0Z" fill="#3FA35B"/>
                             </svg>
                         </div>
                         <div>
-                            <span class="text-base font-bold tracking-tight text-slate-900 dark:text-white block leading-tight">
-                                {{ \App\Models\BusinessProfile::current()->business_name ?: 'Invoice Studio' }}
+                            <span class="text-base font-bold tracking-tight text-slate-900 dark:text-[#E8F5F0] block leading-tight font-display">
+                                {{ \App\Models\BusinessProfile::current()->business_name ?: 'Irvin Benitez' }}
                             </span>
-                            <span class="text-xs text-slate-500 dark:text-slate-400 block leading-tight">Freelance Hub</span>
+                            <span class="text-xs text-[#3FA35B] dark:text-[#B4D333] block leading-tight font-semibold">Invoice Studio</span>
                         </div>
                     </a>
 

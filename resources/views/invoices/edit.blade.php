@@ -257,6 +257,7 @@
                             <label class="block text-[10px] font-semibold text-slate-500 mb-1">PDF Template</label>
                             <select name="pdf_template" x-model="form.pdf_template" class="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                 <option value="modern">Modern</option>
+                                <option value="emerald">Emerald (Irvin Benitez Style)</option>
                                 <option value="classic">Classic</option>
                                 <option value="minimal">Minimalist</option>
                             </select>
