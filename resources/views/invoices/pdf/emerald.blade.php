@@ -544,34 +544,48 @@
                     <table class="payment-grid">
                         <tr>
                             <td class="payment-info-cell">
-                                @if($profile->paypal_email)
-                                    <div class="info-row-label">{{ $t('paypal_email') }}</div>
-                                    <div class="info-row-val">{{ $profile->paypal_email }}</div>
-                                @endif
-
-                                @if($profile->bank_account_name || $profile->owner_name)
-                                    <div class="info-row-label">{{ $t('checks_payable_to') }}</div>
-                                    <div class="info-row-val">{{ $profile->bank_account_name ?: $profile->owner_name }}</div>
-                                @endif
-
                                 @if($profile->bank_name || $profile->bank_iban)
-                                    <div class="info-row-label">{{ $t('bank_transfer') }}</div>
-                                    <div class="info-row-val">
-                                        @if($profile->bank_name)
-                                            <strong>{{ $profile->bank_name }}</strong><br>
-                                        @endif
-                                        @if($profile->bank_iban)
-                                            {{ $t('account_iban') }}: {{ $profile->bank_iban }}<br>
-                                        @endif
-                                        @if($profile->bank_swift)
-                                            {{ $t('routing') }}: {{ $profile->bank_swift }}
-                                        @endif
+                                    <div class="payment-method-block">
+                                        <div class="info-row-label">{{ $t('bank_transfer') }}</div>
+                                        <div class="info-row-val">
+                                            @if($profile->bank_name)
+                                                <strong>{{ $profile->bank_name }}</strong><br>
+                                            @endif
+                                            @if($profile->bank_iban)
+                                                <span style="color: #64748b;">{{ $t('account_iban') }}:</span> <strong>{{ $profile->bank_iban }}</strong><br>
+                                            @endif
+                                            @if($profile->bank_account_name || $profile->owner_name)
+                                                <span style="color: #64748b;">{{ $t('account_name') }}:</span> {{ $profile->bank_account_name ?: $profile->owner_name }}<br>
+                                            @endif
+                                            @if($profile->bank_swift)
+                                                <span style="color: #64748b;">{{ $t('routing') }}:</span> {{ $profile->bank_swift }}
+                                            @endif
+                                        </div>
                                     </div>
                                 @endif
 
-                                @if($invoice->payment_instructions)
-                                    <div class="info-row-val" style="margin-top: 4px;">
-                                        {!! nl2br(e($invoice->payment_instructions)) !!}
+                                @if($profile->paypal_email)
+                                    <div class="payment-method-block" style="margin-top: 6px;">
+                                        <div class="info-row-label">{{ $t('paypal') }}</div>
+                                        <div class="info-row-val"><strong>{{ $profile->paypal_email }}</strong></div>
+                                    </div>
+                                @endif
+
+                                @php
+                                    $extraInstructions = trim($invoice->payment_instructions ?? '');
+                                    $isDuplicate = in_array($extraInstructions, array_map('trim', array_filter([
+                                        $profile->bank_iban,
+                                        $profile->bank_name,
+                                        $profile->paypal_email,
+                                        $profile->tax_id,
+                                        $profile->bank_account_name,
+                                    ])), true);
+                                @endphp
+                                @if($extraInstructions && !$isDuplicate)
+                                    <div class="payment-method-block" style="margin-top: 6px;">
+                                        <div class="info-row-val" style="color: #475569;">
+                                            {!! nl2br(e($extraInstructions)) !!}
+                                        </div>
                                     </div>
                                 @endif
                             </td>
