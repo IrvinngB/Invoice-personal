@@ -6,7 +6,7 @@
 @endphp
 <table class="w-full" style="margin-bottom: 24pt;">
     <tr>
-        <td style="width: {{ $hasShipping ? 30 : 52 }}%; padding-right: 14pt;">
+        <td style="width: {{ $hasShipping ? 28 : 46 }}%; padding-right: 14pt;">
             <div class="label">{{ $ctx->t('billed_to') }}</div>
             <div class="party-name">{{ $client->company ?: $client->name }}</div>
             <div class="party-detail">
@@ -23,7 +23,7 @@
                 <div class="party-detail">{!! nl2br(e($client->shipping_address)) !!}</div>
             </td>
         @endif
-        <td style="width: {{ $hasShipping ? 42 : 48 }}%;">
+        <td style="width: {{ $hasShipping ? 44 : 54 }}%;">
             <table class="meta-table w-full">
                 <tr><td class="meta-key">{{ $ctx->t('issue_date') }}</td><td class="meta-val">{{ $ctx->date($invoice->issue_date) }}</td></tr>
                 @if($invoice->due_date)

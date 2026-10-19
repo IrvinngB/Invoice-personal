@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessProfile;
+use App\Services\PdfService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\File;
 
 class SettingsController extends Controller
@@ -46,7 +48,7 @@ class SettingsController extends Controller
             'credit_note_prefix' => 'nullable|string|max:20',
             'credit_note_number_digits' => 'required|integer|min:1|max:10',
             'next_credit_note_number' => 'required|integer|min:1',
-            'default_template' => 'required|in:modern,classic,minimal,emerald',
+            'default_template' => ['required', Rule::in(array_keys(app(PdfService::class)->availableTemplates()))],
             'default_page_size' => 'required|in:a4,letter',
             'default_locale' => 'nullable|in:en,es',
             'timezone' => 'required|string|timezone',

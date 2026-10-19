@@ -59,7 +59,7 @@
                 <!-- Styles Dropdown -->
                 <div x-show="stylesMenu" @click.away="stylesMenu = false" x-cloak class="absolute left-0 top-full mt-1.5 w-60 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-1.5 z-30 space-y-0.5">
                     <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('app.preview_styles') }}</div>
-                    @foreach(['emerald' => __('app.template_emerald'), 'modern' => __('app.template_modern'), 'classic' => __('app.template_classic'), 'minimal' => __('app.template_minimal')] as $styleKey => $styleLabel)
+                    @foreach($pdfTemplates as $styleKey => $styleLabel)
                         <button type="button" @click="previewStyle = '{{ $styleKey }}'; previewModal = true; stylesMenu = false" class="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-700 dark:text-slate-200 transition">
                             <span>{{ $styleLabel }}</span>
                             @if($invoice->pdf_template === $styleKey)
@@ -540,7 +540,7 @@
 
                 <!-- Style Switcher Tabs -->
                 <div class="flex items-center bg-slate-200 dark:bg-slate-800 p-1 rounded-xl space-x-1">
-                    @foreach(['emerald' => __('app.template_emerald'), 'modern' => __('app.template_modern'), 'classic' => __('app.template_classic'), 'minimal' => __('app.template_minimal')] as $stKey => $stLabel)
+                    @foreach($pdfTemplates as $stKey => $stLabel)
                         <button type="button" @click="previewStyle = '{{ $stKey }}'"
                             :class="previewStyle === '{{ $stKey }}' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
                             class="px-2.5 py-1 text-xs rounded-lg transition">

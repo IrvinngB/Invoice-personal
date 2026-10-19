@@ -243,11 +243,13 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.pdf_template') }}</label>
                     <select name="default_template" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
-                        <option value="modern" {{ old('default_template', $profile->default_template) === 'modern' ? 'selected' : '' }}>{{ __('app.template_modern') }}</option>
-                        <option value="emerald" {{ old('default_template', $profile->default_template) === 'emerald' ? 'selected' : '' }}>{{ __('app.template_emerald') }}</option>
-                        <option value="classic" {{ old('default_template', $profile->default_template) === 'classic' ? 'selected' : '' }}>{{ __('app.template_classic') }}</option>
-                        <option value="minimal" {{ old('default_template', $profile->default_template) === 'minimal' ? 'selected' : '' }}>{{ __('app.template_minimal') }}</option>
+                        @foreach($pdfTemplates as $tplKey => $tplLabel)
+                            <option value="{{ $tplKey }}" {{ old('default_template', $profile->default_template) === $tplKey ? 'selected' : '' }}>{{ $tplLabel }}</option>
+                        @endforeach
                     </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <a href="{{ route('settings.themes.index') }}" class="text-xs font-semibold text-blue-600 hover:underline">{{ __('app.themes_manage') }} &rarr;</a>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.paper_size') }}</label>

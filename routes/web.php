@@ -10,6 +10,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RecurringInvoiceController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
 
 // Localization Switcher
@@ -52,6 +53,15 @@ Route::post('recurring/{recurring}/generate-now', [RecurringInvoiceController::c
 // Settings & Profile
 Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
 Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+
+// Custom invoice themes (preview must be registered before the {theme} routes)
+Route::get('settings/themes', [ThemeController::class, 'index'])->name('settings.themes.index');
+Route::get('settings/themes/create', [ThemeController::class, 'create'])->name('settings.themes.create');
+Route::get('settings/themes/preview', [ThemeController::class, 'preview'])->name('settings.themes.preview');
+Route::post('settings/themes', [ThemeController::class, 'store'])->name('settings.themes.store');
+Route::get('settings/themes/{theme}/edit', [ThemeController::class, 'edit'])->name('settings.themes.edit');
+Route::put('settings/themes/{theme}', [ThemeController::class, 'update'])->name('settings.themes.update');
+Route::delete('settings/themes/{theme}', [ThemeController::class, 'destroy'])->name('settings.themes.destroy');
 
 // Backup & Data Safety
 Route::get('backup/download-sqlite', [BackupController::class, 'downloadSqlite'])->name('backup.download-sqlite');

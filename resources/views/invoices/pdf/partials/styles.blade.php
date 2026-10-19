@@ -72,7 +72,7 @@
     .party-name { font-size: {{ $sz['base'] + 2 }}pt; font-weight: bold; color: {{ $th['ink'] }}; margin-bottom: 2pt; }
     .party-detail { font-size: {{ $sz['base'] }}pt; color: {{ $th['text'] }}; line-height: 1.5; }
     .meta-table td { padding: 2.5pt 0; font-size: {{ $sz['base'] }}pt; }
-    .meta-key { color: {{ $th['muted'] }}; padding-right: 14pt; white-space: nowrap; }
+    .meta-key { color: {{ $th['muted'] }}; padding-right: 14pt; }
     .meta-val { color: {{ $th['ink'] }}; font-weight: bold; text-align: right; white-space: nowrap; }
 
     /* ---------- Items ---------- */

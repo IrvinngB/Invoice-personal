@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\PdfService;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer(['invoices.create', 'invoices.edit', 'invoices.show', 'settings.index'], function ($view) {
+            $view->with('pdfTemplates', app(PdfService::class)->availableTemplates());
+        });
     }
 }

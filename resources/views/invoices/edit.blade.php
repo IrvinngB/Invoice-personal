@@ -257,10 +257,9 @@
                         <div>
                             <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.pdf_template') }}</label>
                             <select name="pdf_template" x-model="form.pdf_template" class="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
-                                <option value="modern">{{ __('app.template_modern') }}</option>
-                                <option value="emerald">{{ __('app.template_emerald') }}</option>
-                                <option value="classic">{{ __('app.template_classic') }}</option>
-                                <option value="minimal">{{ __('app.template_minimal') }}</option>
+                                @foreach($pdfTemplates as $tplKey => $tplLabel)
+                                    <option value="{{ $tplKey }}">{{ $tplLabel }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-2">

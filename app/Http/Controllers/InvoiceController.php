@@ -10,6 +10,7 @@ use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Services\PdfService;
+use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -96,7 +97,7 @@ class InvoiceController extends Controller
             'payment_terms' => 'nullable|string',
             'payment_instructions' => 'nullable|string',
             'payment_link' => 'nullable|url',
-            'pdf_template' => 'required|in:modern,classic,minimal,emerald',
+            'pdf_template' => ['required', Rule::in(array_keys(app(PdfService::class)->availableTemplates()))],
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
             'show_signature' => 'nullable|boolean',
@@ -257,7 +258,7 @@ class InvoiceController extends Controller
             'payment_terms' => 'nullable|string',
             'payment_instructions' => 'nullable|string',
             'payment_link' => 'nullable|url',
-            'pdf_template' => 'required|in:modern,classic,minimal,emerald',
+            'pdf_template' => ['required', Rule::in(array_keys(app(PdfService::class)->availableTemplates()))],
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
             'show_signature' => 'nullable|boolean',
