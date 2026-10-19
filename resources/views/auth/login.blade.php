@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Personal Invoice Studio</title>
+    <title>{{ __('app.login') }} - {{ __('app.page_suffix') }}</title>
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -15,8 +15,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
             </div>
-            <h1 class="text-2xl font-bold tracking-tight text-white">Invoice Studio</h1>
-            <p class="text-sm text-slate-400 mt-1">Single-user secure vault</p>
+            <h1 class="text-2xl font-bold tracking-tight text-white">{{ __('app.studio_name') }}</h1>
+            <p class="text-sm text-slate-400 mt-1">{{ __('app.login_subtitle') }}</p>
         </div>
 
         @if($errors->any())
@@ -28,19 +28,19 @@
         <form method="POST" action="{{ route('login.submit') }}" class="space-y-5">
             @csrf
             <div>
-                <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Master Password</label>
+                <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">{{ __('app.master_password') }}</label>
                 <input type="password" id="password" name="password" required autofocus
-                    placeholder="Enter studio password"
+                    placeholder="{{ __('app.password_placeholder') }}"
                     class="w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
             </div>
 
             <button type="submit" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-600/30 transition transform active:scale-98">
-                Unlock Studio
+                {{ __('app.unlock_studio') }}
             </button>
         </form>
 
         <div class="mt-6 text-center text-xs text-slate-500">
-            For local bypass, set <code class="text-slate-400">LOCAL_MODE=true</code> in <code class="text-slate-400">.env</code>.
+            {{ __('app.local_mode_hint', ['setting' => 'LOCAL_MODE=true', 'file' => '.env']) }}
         </div>
     </div>
 </body>

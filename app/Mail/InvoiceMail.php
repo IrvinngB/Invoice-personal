@@ -24,9 +24,15 @@ class InvoiceMail extends Mailable
     public function envelope(): Envelope
     {
         $profile = BusinessProfile::current();
-        $type = ucfirst($this->invoice->type);
+        $locale = $this->invoice->locale ?: ($profile->default_locale ?: 'en');
+        $type = __($this->invoice->type === 'credit_note' ? 'invoice.credit_note' : "invoice.{$this->invoice->type}", [], $locale);
+
         return new Envelope(
-            subject: "{$type} {$this->invoice->invoice_number} from {$profile->business_name}",
+            subject: __('invoice.mail_subject', [
+                'type' => $type,
+                'number' => $this->invoice->invoice_number,
+                'business' => $profile->business_name,
+            ], $locale),
         );
     }
 
@@ -38,6 +44,7 @@ class InvoiceMail extends Mailable
                 'invoice' => $this->invoice,
                 'profile' => BusinessProfile::current(),
                 'client' => $this->invoice->client,
+                'locale' => $this->invoice->locale ?: (BusinessProfile::current()->default_locale ?: 'en'),
             ]
         );
     }

@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Services & Products Catalog')
+@section('title', __('app.catalog_title'))
 
 @section('content')
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Services & Products Catalog</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Pre-configured items for sub-minute line item insertion.</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{{ __('app.catalog_title') }}</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">{{ __('app.catalog_subtitle') }}</p>
         </div>
         <a href="{{ route('catalog.create') }}" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition active:scale-95">
-            + New Catalog Item
+            + {{ __('app.new_catalog_item') }}
         </a>
     </div>
 
@@ -20,12 +20,12 @@
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
                     <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                        <th class="py-3 px-4 sm:px-6">Item Name</th>
-                        <th class="py-3 px-4">Description</th>
-                        <th class="py-3 px-4">Unit</th>
-                        <th class="py-3 px-4 text-right">Default Price</th>
-                        <th class="py-3 px-4 text-right">Default Tax</th>
-                        <th class="py-3 px-4 sm:px-6 text-right">Actions</th>
+                        <th class="py-3 px-4 sm:px-6">{{ __('app.item_name') }}</th>
+                        <th class="py-3 px-4">{{ __('app.description') }}</th>
+                        <th class="py-3 px-4">{{ __('app.unit') }}</th>
+                        <th class="py-3 px-4 text-right">{{ __('app.default_price') }}</th>
+                        <th class="py-3 px-4 text-right">{{ __('app.default_tax') }}</th>
+                        <th class="py-3 px-4 sm:px-6 text-right">{{ __('app.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -48,14 +48,14 @@
                         </td>
                         <td class="py-3.5 px-4 sm:px-6 text-right space-x-2">
                             <a href="{{ route('catalog.edit', $item) }}" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
-                                Edit
+                                {{ __('app.edit') }}
                             </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="6" class="py-8 text-center text-slate-400">
-                            No catalog items created yet. Add standard services or products here.
+                            {{ __('app.no_catalog_items') }}
                         </td>
                     </tr>
                     @endforelse

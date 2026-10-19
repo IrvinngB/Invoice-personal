@@ -167,9 +167,9 @@
 
                     <select name="type" class="py-2 px-3 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">{{ __('app.all_types') }}</option>
-                        <option value="invoice" {{ request('type') === 'invoice' ? 'selected' : '' }}>Invoices</option>
-                        <option value="quote" {{ request('type') === 'quote' ? 'selected' : '' }}>Quotes</option>
-                        <option value="credit_note" {{ request('type') === 'credit_note' ? 'selected' : '' }}>Credit Notes</option>
+                        <option value="invoice" {{ request('type') === 'invoice' ? 'selected' : '' }}>{{ __('app.invoices_type') }}</option>
+                        <option value="quote" {{ request('type') === 'quote' ? 'selected' : '' }}>{{ __('app.quotes_type') }}</option>
+                        <option value="credit_note" {{ request('type') === 'credit_note' ? 'selected' : '' }}>{{ __('app.credit_notes_type') }}</option>
                     </select>
 
                     <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
@@ -206,7 +206,7 @@
                                 {{ $inv->invoice_number }}
                             </a>
                             <div class="text-[10px] uppercase font-semibold text-slate-400 mt-0.5">
-                                {{ $inv->type }}
+                                {{ __('invoice.' . $inv->type) }}
                             </div>
                         </td>
                         <td class="py-3.5 px-4">
@@ -216,9 +216,9 @@
                             @endif
                         </td>
                         <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300">
-                            <div>{{ $inv->issue_date->format('M d, Y') }}</div>
+                            <div>{{ $inv->issue_date->locale(app()->getLocale())->isoFormat('ll') }}</div>
                             <div class="text-[10px] {{ $inv->isOverdue() ? 'text-rose-500 font-bold' : 'text-slate-400' }}">
-                                Due: {{ $inv->due_date->format('M d, Y') }}
+                                {{ __('app.due_prefix') }} {{ $inv->due_date->locale(app()->getLocale())->isoFormat('ll') }}
                             </div>
                         </td>
                         <td class="py-3.5 px-4">
@@ -244,7 +244,7 @@
                             {{ $inv->formatted_balance }}
                         </td>
                         <td class="py-3.5 px-4 sm:px-6 text-right space-x-2">
-                            <a href="{{ route('invoices.pdf', $inv) }}" target="_blank" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1" title="View PDF">
+                            <a href="{{ route('invoices.pdf', $inv) }}" target="_blank" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1" title="{{ __('app.view_pdf') }}">
                                 <svg class="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>

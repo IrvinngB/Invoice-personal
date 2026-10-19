@@ -1,0 +1,16 @@
+current_phase: archive
+completed:
+  - explore
+  - proposal
+  - spec
+  - clarify
+  - design
+  - blast-radius
+  - tasks
+  - apply
+  - verify
+  - archive
+open_questions: []
+updated: 2026-10-18
+status: archived
+archived_on: 2026-10-18

@@ -31,14 +31,14 @@ class CatalogItemController extends Controller
 
         CatalogItem::create([
             'name' => $validated['name'],
-            'description' => $validated['description'],
+            'description' => $validated['description'] ?? null,
             'unit' => $validated['unit'],
             'unit_price_cents' => (int) round($validated['unit_price'] * 100),
             'tax_rate_bps' => isset($validated['tax_rate_percent']) ? (int) round($validated['tax_rate_percent'] * 100) : 0,
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('catalog.index')->with('success', 'Catalog item added.');
+        return redirect()->route('catalog.index')->with('success', __('app.catalog_item_added'));
     }
 
     public function edit(CatalogItem $catalog)
@@ -59,19 +59,19 @@ class CatalogItemController extends Controller
 
         $catalog->update([
             'name' => $validated['name'],
-            'description' => $validated['description'],
+            'description' => $validated['description'] ?? null,
             'unit' => $validated['unit'],
             'unit_price_cents' => (int) round($validated['unit_price'] * 100),
             'tax_rate_bps' => isset($validated['tax_rate_percent']) ? (int) round($validated['tax_rate_percent'] * 100) : 0,
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('catalog.index')->with('success', 'Catalog item updated.');
+        return redirect()->route('catalog.index')->with('success', __('app.catalog_item_updated'));
     }
 
     public function destroy(CatalogItem $catalog)
     {
         $catalog->delete();
-        return redirect()->route('catalog.index')->with('success', 'Catalog item removed.');
+        return redirect()->route('catalog.index')->with('success', __('app.catalog_item_removed'));
     }
 }

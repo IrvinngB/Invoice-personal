@@ -23,7 +23,7 @@ class BackupController extends Controller
     {
         $dbPath = database_path('database.sqlite');
         if (!file_exists($dbPath)) {
-            return back()->with('error', 'SQLite database file not found.');
+            return back()->with('error', __('app.sqlite_file_missing'));
         }
 
         $timestamp = now()->format('Y-m-d_His');
@@ -58,7 +58,7 @@ class BackupController extends Controller
 
         $file->move(database_path(), 'database.sqlite');
 
-        return redirect()->route('settings.index')->with('success', 'Database restored successfully.');
+        return redirect()->route('settings.index')->with('success', __('app.database_restored'));
     }
 
     /**

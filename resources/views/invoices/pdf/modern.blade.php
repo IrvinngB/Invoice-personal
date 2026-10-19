@@ -4,6 +4,7 @@
     };
     $isPaid = $invoice->status === 'paid';
     $isVoid = $invoice->status === 'void';
+    $dateFormat = $locale === 'es' ? 'D [de] MMMM [de] Y' : 'MMMM D, Y';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}">
@@ -302,7 +303,7 @@
                     <div>{{ $profile->owner_name }}</div>
                 @endif
                 @if($profile->tax_id)
-                    <div>Tax ID: {{ $profile->tax_id }}</div>
+                    <div>{{ $t('tax_id') }}: {{ $profile->tax_id }}</div>
                 @endif
                 <div>{!! nl2br(e($profile->address)) !!}</div>
                 @if($profile->email) <div>{{ $profile->email }}</div> @endif
@@ -328,11 +329,11 @@
             <table class="dates-table" style="margin-top: 15px;">
                 <tr>
                     <td class="dates-label">{{ $t('issue_date') }}:</td>
-                    <td class="dates-val">{{ $invoice->issue_date->format('M d, Y') }}</td>
+                    <td class="dates-val">{{ $invoice->issue_date->locale($locale)->isoFormat($dateFormat) }}</td>
                 </tr>
                 <tr>
                     <td class="dates-label">{{ $t('due_date') }}:</td>
-                    <td class="dates-val">{{ $invoice->due_date->format('M d, Y') }}</td>
+                    <td class="dates-val">{{ $invoice->due_date->locale($locale)->isoFormat($dateFormat) }}</td>
                 </tr>
                 @if($invoice->parentInvoice)
                 <tr>
@@ -353,10 +354,10 @@
             <div class="client-name">{{ $client->company ?: $client->name }}</div>
             <div class="client-meta">
                 @if($client->company && $client->name !== $client->company)
-                    <div>Attn: {{ $client->name }}</div>
+                    <div>{{ $t('attention') }}: {{ $client->name }}</div>
                 @endif
                 @if($client->tax_id)
-                    <div>Tax ID: {{ $client->tax_id }}</div>
+                    <div>{{ $t('tax_id') }}: {{ $client->tax_id }}</div>
                 @endif
                 @if($client->billing_address)
                     <div>{!! nl2br(e($client->billing_address)) !!}</div>
@@ -371,15 +372,15 @@
         </td>
         <td class="info-box" style="text-align: right;">
             <!-- Currency notice or quick status summary -->
-            <div class="info-heading">CURRENCY & TERMS</div>
+            <div class="info-heading">{{ $t('currency_terms') }}</div>
             <div style="font-size: 11px; font-weight: 600; color: #0f172a;">
                 {{ $invoice->currency }}
                 @if($invoice->exchange_rate && (float)$invoice->exchange_rate != 1.0)
-                    <span style="font-size: 9.5px; color: #64748b; font-weight: normal;">(Rate: {{ $invoice->exchange_rate }})</span>
+                    <span style="font-size: 9.5px; color: #64748b; font-weight: normal;">({{ $t('rate') }}: {{ $invoice->exchange_rate }})</span>
                 @endif
             </div>
             <div style="font-size: 10px; color: #64748b; margin-top: 3px;">
-                {{ $invoice->payment_terms ?: 'Payment due within 14 days' }}
+                {{ $invoice->payment_terms ?: $t('payment_due_within_days', ['days' => 14]) }}
             </div>
         </td>
     </tr>
@@ -481,7 +482,7 @@
                 @endif
                 @if($invoice->tax_total_cents > 0)
                 <tr>
-                    <td class="sum-label">{{ $t('tax') }} ({{ $invoice->tax_inclusive ? 'Incl.' : 'Excl.' }}):</td>
+                    <td class="sum-label">{{ $t('tax') }} ({{ $invoice->tax_inclusive ? $t('tax_included') : $t('tax_excluded') }}):</td>
                     <td class="sum-val">{{ \App\Services\InvoiceCalculationService::formatMoney($invoice->tax_total_cents, $invoice->currency, $locale) }}</td>
                 </tr>
                 @endif

@@ -26,10 +26,10 @@ class AuthController extends Controller
         if (hash_equals((string) $configuredPassword, (string) $request->input('password'))) {
             $request->session()->put('authenticated', true);
             $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'))->with('success', 'Welcome back!');
+            return redirect()->intended(route('dashboard'))->with('success', __('app.login_success'));
         }
 
-        return back()->withErrors(['password' => 'Incorrect password.']);
+        return back()->withErrors(['password' => __('app.login_failed')]);
     }
 
     public function logout(Request $request)
@@ -38,6 +38,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('info', 'Logged out.');
+        return redirect()->route('login')->with('info', __('app.logout_success'));
     }
 }

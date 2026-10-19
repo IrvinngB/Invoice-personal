@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Create ' . ucfirst($type))
+@section('title', __('app.create_document', ['type' => __('invoice.' . $type)]))
 
 @section('content')
 <div x-data="invoiceBuilder({
@@ -24,27 +24,27 @@
         <div>
             <div class="flex items-center space-x-2">
                 <a href="{{ route('invoices.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition">
-                    &larr; Invoices
+                    &larr; {{ __('app.back_to_invoices') }}
                 </a>
                 <span class="text-xs text-slate-400">/</span>
                 <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                    New {{ ucfirst($type) }}
+                    {{ __('app.new_document', ['type' => __('invoice.' . $type)]) }}
                 </span>
             </div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
-                Draft {{ $previewNumber }}
+                {{ __('app.draft') }} {{ $previewNumber }}
             </h1>
         </div>
 
         <div class="flex items-center space-x-3">
             <a href="{{ route('invoices.index') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
-                Cancel
+                {{ __('app.cancel') }}
             </a>
             <button type="button" @click="submitForm()" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition active:scale-95 flex items-center">
                 <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
-                Save {{ ucfirst($type) }}
+                {{ __('app.save_document', ['type' => __('invoice.' . $type)]) }}
             </button>
         </div>
     </div>
@@ -63,14 +63,14 @@
                 <!-- Client & Dates Card -->
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Recipient & Numbering</h3>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.recipient_numbering') }}</h3>
                     </div>
 
                     <!-- Custom / Continuing Invoice Number -->
                     <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-1.5">
                         <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                            Número del Documento
-                            <span class="text-[11px] font-normal text-slate-500 dark:text-slate-400">(Editable: continuá tu serie anterior o dejá el automático)</span>
+                            {{ __('app.document_number') }}
+                            <span class="text-[11px] font-normal text-slate-500 dark:text-slate-400">{{ __('app.document_number_help') }}</span>
                         </label>
                         <div class="flex items-center space-x-2">
                             <input type="text" name="invoice_number" value="{{ old('invoice_number', $previewNumber) }}"
@@ -78,7 +78,7 @@
                                 class="w-full px-3 py-2 text-xs font-mono font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 focus:ring-2 focus:ring-blue-500">
                         </div>
                         <p class="text-[10px] text-slate-500 dark:text-slate-400">
-                            Podés ingresar por ej. <strong class="font-mono text-slate-700 dark:text-slate-200">00009</strong> o <strong class="font-mono text-slate-700 dark:text-slate-200">Factura No. 00009</strong>. Las próximas facturas continuarán la correlación automáticamente desde este número.
+                            {{ __('app.document_number_description') }}
                         </p>
                     </div>
 
@@ -93,7 +93,7 @@
                             <label class="inline-flex items-center text-xs font-bold text-amber-900 dark:text-amber-100 cursor-pointer pt-1">
                                 <input type="checkbox" name="allow_duplicate" value="1" {{ old('allow_duplicate') ? 'checked' : '' }}
                                     class="rounded border-amber-400 text-amber-600 focus:ring-amber-500 mr-2">
-                                <span>Confirmar y permitir emitir factura adicional para este cliente en esta fecha</span>
+                                <span>{{ __('app.allow_duplicate_invoice') }}</span>
                             </label>
                         </div>
                     @endif
@@ -102,17 +102,17 @@
                         <!-- Client Selection -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                                Client <span class="text-rose-500">*</span>
+                                {{ __('app.client') }} <span class="text-rose-500">*</span>
                             </label>
                             <div class="flex items-center space-x-2">
                                 <select name="client_id" x-model="form.client_id" @change="onClientChange()" required
                                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500">
-                                    <option value="">-- Select Client --</option>
+                                    <option value="">{{ __('app.select_client') }}</option>
                                     <template x-for="c in clients" :key="c.id">
                                         <option :value="c.id" x-text="c.company ? `${c.company} (${c.name})` : c.name"></option>
                                     </template>
                                 </select>
-                                <a href="{{ route('clients.create') }}" target="_blank" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition" title="Add New Client">
+                                <a href="{{ route('clients.create') }}" target="_blank" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition" title="{{ __('app.add_new_client') }}">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                                     </svg>
@@ -123,12 +123,12 @@
                         <!-- Currency & Rate -->
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Currency</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.currency') }}</label>
                                 <input type="text" name="currency" x-model="form.currency" maxlength="3" required
                                     class="w-full px-3 py-2 text-xs uppercase font-bold rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Exch. Rate</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.exchange_rate') }}</label>
                                 <input type="number" step="0.0001" name="exchange_rate" x-model="form.exchange_rate"
                                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                             </div>
@@ -138,17 +138,17 @@
                     <!-- Dates & Payment terms -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Issue Date</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.issue_date') }}</label>
                             <input type="date" name="issue_date" x-model="form.issue_date" @change="recalculateDueDate()" required
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Payment Terms (Days)</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.payment_terms') }}</label>
                             <input type="number" min="0" x-model="form.terms_days" @change="recalculateDueDate()"
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Due Date</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.due_date') }}</label>
                             <input type="date" name="due_date" x-model="form.due_date" required
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                         </div>
@@ -159,8 +159,8 @@
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Line Items</h3>
-                            <p class="text-xs text-slate-400">Drag items to reorder · Supports fractional units & hours</p>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.line_items') }}</h3>
+                            <p class="text-xs text-slate-400">{{ __('app.drag_reorder_help') }}</p>
                         </div>
                         <!-- Catalog Autocomplete dropdown -->
                         <div x-data="{ open: false }" class="relative">
@@ -168,7 +168,7 @@
                                 <svg class="w-3.5 h-3.5 mr-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                                Add from Catalog
+                                {{ __('app.add_from_catalog') }}
                             </button>
                             <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-20 max-h-60 overflow-y-auto p-1 text-xs" x-cloak>
                                 <template x-for="item in catalogItems" :key="item.id">
@@ -196,13 +196,13 @@
                                     <!-- Description Input -->
                                     <div class="flex-1">
                                         <input type="text" :name="`items[${index}][description]`" x-model="item.description" required
-                                            placeholder="Description of work, service or product..."
+                                            placeholder="{{ __('app.work_description_placeholder') }}"
                                             class="w-full px-3 py-1.5 text-xs font-medium rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500">
                                     </div>
 
                                     <!-- Remove Button -->
                                     <button type="button" @click="removeItem(index)" :disabled="items.length <= 1"
-                                        class="p-1.5 text-slate-400 hover:text-rose-500 disabled:opacity-30 disabled:hover:text-slate-400 transition shrink-0" title="Delete Line">
+                                        class="p-1.5 text-slate-400 hover:text-rose-500 disabled:opacity-30 disabled:hover:text-slate-400 transition shrink-0" title="{{ __('app.delete_line') }}">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -212,32 +212,32 @@
                                 <!-- Numerical inputs row -->
                                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pl-6">
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Qty</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('invoice.qty') }}</label>
                                         <input type="number" step="0.0001" min="0.0001" :name="`items[${index}][quantity]`" x-model="item.quantity" @input="recalc()" required
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                     </div>
 
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Unit</label>
-                                        <input type="text" :name="`items[${index}][unit]`" x-model="item.unit" placeholder="hours" required
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('invoice.unit') }}</label>
+                                        <input type="text" :name="`items[${index}][unit]`" x-model="item.unit" placeholder="{{ __('app.unit_hours') }}" required
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                     </div>
 
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Price</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('invoice.price') }}</label>
                                         <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model="item.unit_price" @input="recalc()" required
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-right">
                                     </div>
 
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Disc. %</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.discount_percent') }}</label>
                                         <input type="number" step="0.1" min="0" max="100" :name="`items[${index}][discount_percent]`" x-model="item.discount_percent" @input="recalc()"
                                             placeholder="0"
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-right">
                                     </div>
 
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Tax %</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.tax_percent') }}</label>
                                         <input type="number" step="0.1" min="0" max="100" :name="`items[${index}][tax_rate_percent]`" x-model="item.tax_rate_percent" @input="recalc()"
                                             placeholder="0"
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-right">
@@ -252,29 +252,29 @@
                         <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                         </svg>
-                        Add Another Line Item
+                        {{ __('app.add_line_item') }}
                     </button>
                 </div>
 
                 <!-- Notes & Instructions Card -->
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Notes & Payment Details</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.notes_payment_details') }}</h3>
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Customer Notes / Work Details</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.customer_notes_work_details') }}</label>
                             <textarea name="notes" rows="3" x-model="form.notes"
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400"></textarea>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Payment Terms</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.payment_terms') }}</label>
                                 <textarea name="payment_terms" rows="2" x-model="form.payment_terms"
                                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Online Payment URL (QR Code payload)</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.online_payment_url') }}</label>
                                 <input type="url" name="payment_link" x-model="form.payment_link" placeholder="https://buy.stripe.com/..."
                                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400">
                             </div>
@@ -289,16 +289,16 @@
 
                 <!-- Totals Breakdown Card -->
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 sticky top-20">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Financial Summary</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.financial_summary') }}</h3>
 
                     <div class="space-y-2.5 text-xs">
                         <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                            <span>Subtotal:</span>
+                            <span>{{ __('invoice.subtotal') }}:</span>
                             <span class="font-semibold text-slate-900 dark:text-white" x-text="formatMoney(totals.subtotal)"></span>
                         </div>
 
                         <div x-show="totals.discount > 0" class="flex justify-between text-emerald-600 dark:text-emerald-400">
-                            <span>Discounts:</span>
+                            <span>{{ __('app.discounts') }}:</span>
                             <span class="font-semibold" x-text="'-' + formatMoney(totals.discount)"></span>
                         </div>
 
@@ -309,7 +309,7 @@
 
                         <!-- Shipping / Extra fee input -->
                         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <span class="text-slate-600 dark:text-slate-400">Extra / Shipping Fee:</span>
+                            <span class="text-slate-600 dark:text-slate-400">{{ __('app.extra_shipping_fee') }}:</span>
                             <div class="w-24">
                                 <input type="number" step="0.01" min="0" name="shipping_fee" x-model="form.shipping_fee" @input="recalc()"
                                     class="w-full px-2 py-1 text-xs text-right rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
@@ -318,43 +318,43 @@
 
                         <!-- Grand Total -->
                         <div class="pt-3 border-t-2 border-slate-200 dark:border-slate-700 flex justify-between items-baseline">
-                            <span class="text-sm font-bold text-slate-900 dark:text-white">Total Amount:</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">{{ __('app.total_amount') }}:</span>
                             <span class="text-xl font-black text-blue-600 dark:text-blue-400" x-text="formatMoney(totals.total)"></span>
                         </div>
 
                         <div class="p-3 bg-blue-50/60 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900/50 flex justify-between items-center text-blue-900 dark:text-blue-200 font-bold">
-                            <span>Balance Due:</span>
+                            <span>{{ __('app.balance_due') }}:</span>
                             <span class="text-base" x-text="formatMoney(totals.total)"></span>
                         </div>
                     </div>
 
                     <!-- PDF / Render Options -->
                     <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
-                        <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Document Layout</h4>
+                        <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">{{ __('app.document_layout') }}</h4>
 
                         <div>
-                            <label class="block text-[10px] font-semibold text-slate-500 mb-1">PDF Template</label>
+                            <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.pdf_template') }}</label>
                             <select name="pdf_template" x-model="form.pdf_template" class="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
-                                <option value="modern">Modern (Default)</option>
-                                <option value="emerald">Emerald (Irvin Benitez Style)</option>
-                                <option value="classic">Classic Formal</option>
-                                <option value="minimal">Minimalist</option>
+                                <option value="modern">{{ __('app.modern_default') }}</option>
+                                <option value="emerald">{{ __('app.template_emerald') }}</option>
+                                <option value="classic">{{ __('app.classic_formal') }}</option>
+                                <option value="minimal">{{ __('app.template_minimal') }}</option>
                             </select>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Page Size</label>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.paper_size') }}</label>
                                 <select name="page_size" x-model="form.page_size" class="w-full px-2 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                     <option value="a4">A4</option>
-                                    <option value="letter">US Letter</option>
+                                    <option value="letter">{{ __('app.us_letter') }}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Language</label>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.default_language') }}</label>
                                 <select name="locale" x-model="form.locale" class="w-full px-2 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
-                                    <option value="en">English (EN)</option>
-                                    <option value="es">Español (ES)</option>
+                                    <option value="en">{{ __('app.english_language') }}</option>
+                                    <option value="es">{{ __('app.spanish_language') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -363,14 +363,14 @@
                             <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
                                 <input type="checkbox" name="tax_inclusive" x-model="form.tax_inclusive" @change="recalc()" value="1"
                                     class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mr-2">
-                                <span>Prices are tax-inclusive</span>
+                                <span>{{ __('app.prices_tax_inclusive') }}</span>
                             </label>
                         </div>
                     </div>
 
                     <!-- Shortcut note -->
                     <div class="text-[10px] text-slate-400 text-center pt-2">
-                        Tip: Press <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded border border-slate-300 dark:border-slate-700">Cmd+S</kbd> / <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded border border-slate-300 dark:border-slate-700">Ctrl+S</kbd> to save.
+                        {{ __('app.save_shortcut_tip', ['primary' => 'Cmd+S', 'secondary' => 'Ctrl+S']) }}
                     </div>
                 </div>
 

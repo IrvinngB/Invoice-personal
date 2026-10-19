@@ -4,6 +4,7 @@
     };
     $isPaid = $invoice->status === 'paid';
     $isVoid = $invoice->status === 'void';
+    $dateFormat = $locale === 'es' ? 'D [de] MMMM [de] Y' : 'MMMM D, Y';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}">
@@ -84,14 +85,14 @@
         <td style="width: 60%; vertical-align: top;">
             <div class="company-name">{{ $profile->business_name }}</div>
             <div>{!! nl2br(e($profile->address)) !!}</div>
-            @if($profile->tax_id) <div>Tax ID: {{ $profile->tax_id }}</div> @endif
+            @if($profile->tax_id) <div>{{ $t('tax_id') }}: {{ $profile->tax_id }}</div> @endif
             @if($profile->email) <div>{{ $profile->email }}</div> @endif
         </td>
         <td style="width: 40%; text-align: right; vertical-align: top;">
             <div class="doc-title">{{ $invoice->type === 'quote' ? $t('quote') : ($invoice->type === 'credit_note' ? $t('credit_note') : $t('invoice')) }}</div>
             <div style="font-size: 14px; font-weight: bold;">{{ $invoice->invoice_number }}</div>
-            <div style="margin-top: 8px;">{{ $t('issue_date') }}: {{ $invoice->issue_date->format('d/m/Y') }}</div>
-            <div>{{ $t('due_date') }}: {{ $invoice->due_date->format('d/m/Y') }}</div>
+            <div style="margin-top: 8px;">{{ $t('issue_date') }}: {{ $invoice->issue_date->locale($locale)->isoFormat($dateFormat) }}</div>
+            <div>{{ $t('due_date') }}: {{ $invoice->due_date->locale($locale)->isoFormat($dateFormat) }}</div>
         </td>
     </tr>
 </table>
@@ -101,9 +102,9 @@
         <td class="info-col">
             <div style="font-weight: bold; text-transform: uppercase; margin-bottom: 4px;">{{ $t('billed_to') }}:</div>
             <div style="font-size: 14px; font-weight: bold;">{{ $client->company ?: $client->name }}</div>
-            @if($client->company && $client->name !== $client->company) <div>Attn: {{ $client->name }}</div> @endif
+            @if($client->company && $client->name !== $client->company) <div>{{ $t('attention') }}: {{ $client->name }}</div> @endif
             @if($client->billing_address) <div>{!! nl2br(e($client->billing_address)) !!}</div> @endif
-            @if($client->tax_id) <div>Tax ID: {{ $client->tax_id }}</div> @endif
+            @if($client->tax_id) <div>{{ $t('tax_id') }}: {{ $client->tax_id }}</div> @endif
         </td>
     </tr>
 </table>

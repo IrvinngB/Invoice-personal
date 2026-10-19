@@ -30,7 +30,7 @@ class PaymentController extends Controller
             $request->notes
         );
 
-        return back()->with('success', 'Payment recorded successfully.');
+        return back()->with('success', __('app.payment_recorded'));
     }
 
     public function destroy(Payment $payment)
@@ -50,6 +50,6 @@ class PaymentController extends Controller
             ]);
         });
 
-        return back()->with('success', 'Payment deleted and invoice balance recalculated.');
+        return back()->with('success', __('app.payment_deleted'));
     }
 }

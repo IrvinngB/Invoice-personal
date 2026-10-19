@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit ' . $invoice->invoice_number)
+@section('title', __('app.edit') . ' ' . $invoice->invoice_number)
 
 @section('content')
 <div x-data="invoiceBuilder({
@@ -34,11 +34,11 @@
         <div>
             <div class="flex items-center space-x-2">
                 <a href="{{ route('invoices.show', $invoice) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition">
-                    &larr; Back to {{ $invoice->invoice_number }}
+                    &larr; {{ __('app.back_to_invoices') }}
                 </a>
                 <span class="text-xs text-slate-400">/</span>
                 <span class="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                    Editing Draft
+                    {{ __('app.edit_draft') }}
                 </span>
             </div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
@@ -48,13 +48,13 @@
 
         <div class="flex items-center space-x-3">
             <a href="{{ route('invoices.show', $invoice) }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
-                Cancel
+                {{ __('app.cancel') }}
             </a>
             <button type="button" @click="submitForm()" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 transition active:scale-95 flex items-center">
                 <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
-                Update Document
+                {{ __('app.update_document') }}
             </button>
         </div>
     </div>
@@ -69,11 +69,11 @@
 
                 <!-- Client & Dates Card -->
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Recipient & Schedule</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.recipient_schedule') }}</h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Client</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.client') }}</label>
                             <select name="client_id" x-model="form.client_id" required
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                 <template x-for="c in clients" :key="c.id">
@@ -84,12 +84,12 @@
 
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Currency</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.currency') }}</label>
                                 <input type="text" name="currency" x-model="form.currency" maxlength="3" required
                                     class="w-full px-3 py-2 text-xs uppercase font-bold rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Exch. Rate</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.exchange_rate') }}</label>
                                 <input type="number" step="0.0001" name="exchange_rate" x-model="form.exchange_rate"
                                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                             </div>
@@ -98,12 +98,12 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Issue Date</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.issue_date') }}</label>
                             <input type="date" name="issue_date" value="{{ $invoice->issue_date->format('Y-m-d') }}" required
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Due Date</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.due_date') }}</label>
                             <input type="date" name="due_date" value="{{ $invoice->due_date->format('Y-m-d') }}" required
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                         </div>
@@ -114,15 +114,15 @@
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Line Items</h3>
-                            <p class="text-xs text-slate-400">Drag items to reorder · Supports fractional units & hours</p>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.line_items') }}</h3>
+                            <p class="text-xs text-slate-400">{{ __('app.drag_reorder_help') }}</p>
                         </div>
                         <div x-data="{ open: false }" class="relative">
                             <button type="button" @click="open = !open" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 transition flex items-center">
                                 <svg class="w-3.5 h-3.5 mr-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                                Add from Catalog
+                                {{ __('app.add_from_catalog') }}
                             </button>
                             <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-20 max-h-60 overflow-y-auto p-1 text-xs" x-cloak>
                                 <template x-for="item in catalogItems" :key="item.id">
@@ -160,27 +160,27 @@
 
                                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pl-6">
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Qty</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('invoice.qty') }}</label>
                                         <input type="number" step="0.0001" min="0.0001" :name="`items[${index}][quantity]`" x-model="item.quantity" @input="recalc()" required
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Unit</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('invoice.unit') }}</label>
                                         <input type="text" :name="`items[${index}][unit]`" x-model="item.unit" required
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Price</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('invoice.price') }}</label>
                                         <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model="item.unit_price" @input="recalc()" required
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-right">
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Disc. %</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.discount_percent') }}</label>
                                         <input type="number" step="0.1" min="0" max="100" :name="`items[${index}][discount_percent]`" x-model="item.discount_percent" @input="recalc()"
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-right">
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">Tax %</label>
+                                        <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.tax_percent') }}</label>
                                         <input type="number" step="0.1" min="0" max="100" :name="`items[${index}][tax_rate_percent]`" x-model="item.tax_rate_percent" @input="recalc()"
                                             class="w-full px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-right">
                                     </div>
@@ -196,21 +196,21 @@
 
                 <!-- Notes & Instructions -->
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Notes & Payment Details</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.notes_payment_details') }}</h3>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Customer Notes</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.customer_notes') }}</label>
                             <textarea name="notes" rows="3" x-model="form.notes"
                                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"></textarea>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Payment Terms</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.payment_terms') }}</label>
                                 <textarea name="payment_terms" rows="2" x-model="form.payment_terms"
                                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Payment Link</label>
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.payment_url') }}</label>
                                 <input type="url" name="payment_link" x-model="form.payment_link"
                                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                             </div>
@@ -223,15 +223,15 @@
             <!-- Right Column -->
             <div class="space-y-6">
                 <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 sticky top-20">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Financial Summary</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.financial_summary') }}</h3>
 
                     <div class="space-y-2.5 text-xs">
                         <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                            <span>Subtotal:</span>
+                            <span>{{ __('invoice.subtotal') }}:</span>
                             <span class="font-semibold text-slate-900 dark:text-white" x-text="formatMoney(totals.subtotal)"></span>
                         </div>
                         <div x-show="totals.discount > 0" class="flex justify-between text-emerald-600 dark:text-emerald-400">
-                            <span>Discounts:</span>
+                            <span>{{ __('app.discounts') }}:</span>
                             <span class="font-semibold" x-text="'-' + formatMoney(totals.discount)"></span>
                         </div>
                         <div x-show="totals.tax > 0" class="flex justify-between text-slate-600 dark:text-slate-400">
@@ -239,14 +239,14 @@
                             <span class="font-semibold text-slate-900 dark:text-white" x-text="formatMoney(totals.tax)"></span>
                         </div>
                         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <span class="text-slate-600 dark:text-slate-400">Extra / Shipping:</span>
+                            <span class="text-slate-600 dark:text-slate-400">{{ __('app.extra_shipping') }}:</span>
                             <div class="w-24">
                                 <input type="number" step="0.01" min="0" name="shipping_fee" x-model="form.shipping_fee" @input="recalc()"
                                     class="w-full px-2 py-1 text-xs text-right rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                             </div>
                         </div>
                         <div class="pt-3 border-t-2 border-slate-200 dark:border-slate-700 flex justify-between items-baseline">
-                            <span class="text-sm font-bold text-slate-900 dark:text-white">Total Amount:</span>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">{{ __('app.total_amount') }}:</span>
                             <span class="text-xl font-black text-blue-600 dark:text-blue-400" x-text="formatMoney(totals.total)"></span>
                         </div>
                     </div>
@@ -254,24 +254,24 @@
                     <!-- Layout Options -->
                     <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                         <div>
-                            <label class="block text-[10px] font-semibold text-slate-500 mb-1">PDF Template</label>
+                            <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.pdf_template') }}</label>
                             <select name="pdf_template" x-model="form.pdf_template" class="w-full px-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
-                                <option value="modern">Modern</option>
-                                <option value="emerald">Emerald (Irvin Benitez Style)</option>
-                                <option value="classic">Classic</option>
-                                <option value="minimal">Minimalist</option>
+                                <option value="modern">{{ __('app.template_modern') }}</option>
+                                <option value="emerald">{{ __('app.template_emerald') }}</option>
+                                <option value="classic">{{ __('app.template_classic') }}</option>
+                                <option value="minimal">{{ __('app.template_minimal') }}</option>
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Page Size</label>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.paper_size') }}</label>
                                 <select name="page_size" x-model="form.page_size" class="w-full px-2 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                     <option value="a4">A4</option>
-                                    <option value="letter">Letter</option>
+                                    <option value="letter">{{ __('app.us_letter') }}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Language</label>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-1">{{ __('app.default_language') }}</label>
                                 <select name="locale" x-model="form.locale" class="w-full px-2 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                                     <option value="en">EN</option>
                                     <option value="es">ES</option>
@@ -282,7 +282,7 @@
                             <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
                                 <input type="checkbox" name="tax_inclusive" x-model="form.tax_inclusive" @change="recalc()" value="1"
                                     class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mr-2">
-                                <span>Tax-inclusive pricing</span>
+                                <span>{{ __('app.prices_tax_inclusive') }}</span>
                             </label>
                         </div>
                     </div>

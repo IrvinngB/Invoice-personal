@@ -1,0 +1,20 @@
+schema: spec-driven
+artifact_store: files
+stack: "PHP 8.2+ / Laravel 12.69.3; JavaScript (ES modules) / Vite 7.0.7"
+context: |
+  Aplicación monolítica de facturación para un solo usuario.
+  HTTP: rutas web de Laravel → controladores → Eloquent/models y servicios.
+  UI renderizada en Blade con Alpine.js, Tailwind CSS 4 y activos compilados con Vite.
+  Persistencia SQLite; migraciones en database/migrations y modelos Eloquent en app/Models.
+  Lógica financiera en app/Services/InvoiceCalculationService; PDF mediante DomPDF.
+  Localización en lang/en y lang/es; middleware SetLocale aplica la sesión por petición.
+  Pruebas PHPUnit separadas en tests/Unit y tests/Feature, con SQLite en memoria.
+strict_tdd: true
+security_review: false
+testing:
+  full: "composer test"
+  focused: "php artisan test --filter=<filter>"
+  lint: "none"
+  typecheck: "none"
+experts:
+  - "none found"

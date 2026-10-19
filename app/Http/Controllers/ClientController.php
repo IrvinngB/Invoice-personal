@@ -69,7 +69,7 @@ class ClientController extends Controller
             'locale' => $validated['locale'],
         ]);
 
-        return redirect()->route('clients.index')->with('success', 'Client created successfully.');
+        return redirect()->route('clients.index')->with('success', __('app.client_created'));
     }
 
     public function show(Client $client)
@@ -125,16 +125,16 @@ class ClientController extends Controller
             'locale' => $validated['locale'],
         ]);
 
-        return redirect()->route('clients.show', $client)->with('success', 'Client updated successfully.');
+        return redirect()->route('clients.show', $client)->with('success', __('app.client_updated'));
     }
 
     public function destroy(Client $client)
     {
         if ($client->invoices()->exists()) {
-            return back()->with('error', 'Cannot delete client with existing invoices. Archive or void invoices first.');
+            return back()->with('error', __('app.client_delete_rejected'));
         }
 
         $client->delete();
-        return redirect()->route('clients.index')->with('success', 'Client deleted.');
+        return redirect()->route('clients.index')->with('success', __('app.client_deleted'));
     }
 }

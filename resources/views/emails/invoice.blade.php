@@ -10,25 +10,30 @@
     </style>
 </head>
 <body>
+    @php
+        $t = fn ($key, $replace = []) => __("invoice.{$key}", $replace, $locale);
+        $documentType = $invoice->type === 'credit_note' ? $t('credit_note') : $t($invoice->type);
+        $formattedDueDate = $invoice->due_date?->locale($locale)->isoFormat($locale === 'es' ? 'D [de] MMMM [de] Y' : 'MMMM D, Y');
+    @endphp
     <div class="container">
-        <h2>Hello {{ $client->name }},</h2>
-        <p>Please find attached <strong>{{ ucfirst($invoice->type) }} {{ $invoice->invoice_number }}</strong> from <strong>{{ $profile->business_name }}</strong>.</p>
+        <h2>{{ $t('mail_greeting', ['name' => $client->name]) }}</h2>
+        <p>{{ $t('mail_attached', ['type' => $documentType, 'number' => $invoice->invoice_number, 'business' => $profile->business_name]) }}</p>
         
         <div class="meta">
-            <div><strong>Amount Due:</strong> {{ \App\Services\InvoiceCalculationService::formatMoney($invoice->balance_cents, $invoice->currency, $invoice->locale) }}</div>
-            <div><strong>Due Date:</strong> {{ $invoice->due_date->format('M d, Y') }}</div>
+            <div><strong>{{ $t('mail_amount_due') }}:</strong> {{ \App\Services\InvoiceCalculationService::formatMoney($invoice->balance_cents, $invoice->currency, $locale) }}</div>
+            <div><strong>{{ $t('due_date') }}:</strong> {{ $formattedDueDate }}</div>
         </div>
 
         @if($invoice->payment_link)
-            <p><a href="{{ $invoice->payment_link }}" class="btn">Pay Online Now</a></p>
+            <p><a href="{{ $invoice->payment_link }}" class="btn">{{ $t('mail_pay_online') }}</a></p>
         @endif
 
         @if($invoice->notes)
-            <p><strong>Notes:</strong><br>{{ $invoice->notes }}</p>
+            <p><strong>{{ $t('notes') }}:</strong><br>{{ $invoice->notes }}</p>
         @endif
 
-        <p>Thank you for your business!</p>
-        <p>Best regards,<br><strong>{{ $profile->owner_name }}</strong><br>{{ $profile->business_name }}</p>
+        <p>{{ $t('thank_you') }}</p>
+        <p>{{ $t('mail_best_regards') }}<br><strong>{{ $profile->owner_name }}</strong><br>{{ $profile->business_name }}</p>
     </div>
 </body>
 </html>

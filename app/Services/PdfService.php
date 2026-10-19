@@ -10,12 +10,19 @@ use chillerlan\QRCode\QROptions;
 
 class PdfService
 {
+    public const SUPPORTED_TEMPLATES = ['modern', 'classic', 'minimal', 'emerald'];
+
+    public function supportsTemplate(?string $template): bool
+    {
+        return in_array($template, self::SUPPORTED_TEMPLATES, true);
+    }
+
     /**
      * Generate DomPDF instance for the invoice.
      */
-    public function generate(Invoice $invoice)
+    public function generate(Invoice $invoice, ?BusinessProfile $profile = null)
     {
-        $profile = BusinessProfile::current();
+        $profile ??= BusinessProfile::current();
         $template = $invoice->pdf_template ?: ($profile->default_template ?: 'modern');
         $pageSize = strtolower($invoice->page_size ?: ($profile->default_page_size ?: 'a4'));
         $locale = $invoice->locale ?: ($profile->default_locale ?: 'en');

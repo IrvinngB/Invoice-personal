@@ -119,7 +119,7 @@ class InvoiceController extends Controller
 
             if ($existingInvoice) {
                 throw ValidationException::withMessages([
-                    'client_id' => "Ya existe una factura activa ({$existingInvoice->invoice_number}) emitida para este cliente en la misma fecha ({$request->issue_date}). Si deseas emitir una factura adicional para este cliente en esta fecha, confirma marcando la casilla correspondiente.",
+                    'client_id' => __('app.invoice_duplicate_rejected', ['number' => $existingInvoice->invoice_number, 'date' => $request->issue_date]),
                 ]);
             }
         }
@@ -212,7 +212,7 @@ class InvoiceController extends Controller
             return $invoice;
         });
 
-        return redirect()->route('invoices.show', $invoice)->with('success', "{$invoice->invoice_number} created successfully.");
+        return redirect()->route('invoices.show', $invoice)->with('success', __('app.invoice_created', ['number' => $invoice->invoice_number]));
     }
 
     public function show(Invoice $invoice)
@@ -227,7 +227,7 @@ class InvoiceController extends Controller
     {
         if ($invoice->isLocked()) {
             return redirect()->route('invoices.show', $invoice)
-                ->with('error', 'This document is finalized and locked against direct edits. Duplicate it or issue a credit note instead.');
+                ->with('error', __('app.invoice_locked_for_editing'));
         }
 
         $profile = BusinessProfile::current();
@@ -240,7 +240,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
         if ($invoice->isLocked()) {
-            return redirect()->route('invoices.show', $invoice)->with('error', 'Finalized invoices cannot be modified.');
+            return redirect()->route('invoices.show', $invoice)->with('error', __('app.finalized_invoice_cannot_be_modified'));
         }
 
         $request->validate([
@@ -312,49 +312,49 @@ class InvoiceController extends Controller
             AuditLog::log($invoice->id, 'updated', ['total_cents' => $invoice->total_cents]);
         });
 
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice updated.');
+        return redirect()->route('invoices.show', $invoice)->with('success', __('app.invoice_updated'));
     }
 
     public function destroy(Invoice $invoice)
     {
         if ($invoice->isLocked()) {
-            return back()->with('error', 'Cannot delete finalized documents. Void the invoice instead.');
+            return back()->with('error', __('app.finalized_invoice_cannot_be_deleted'));
         }
 
         $invoice->items()->delete();
         $invoice->delete();
 
-        return redirect()->route('invoices.index')->with('success', 'Draft deleted.');
+        return redirect()->route('invoices.index')->with('success', __('app.draft_deleted'));
     }
 
     public function finalize(Invoice $invoice)
     {
         $invoice->finalize();
-        return back()->with('success', 'Document finalized and locked against edits.');
+        return back()->with('success', __('app.document_finalized'));
     }
 
     public function void(Request $request, Invoice $invoice)
     {
-        $invoice->markAsVoid($request->input('reason', 'Manually voided by user'));
-        return back()->with('success', 'Invoice has been marked as void.');
+        $invoice->markAsVoid($request->input('reason', __('app.manually_voided')));
+        return back()->with('success', __('app.invoice_voided'));
     }
 
     public function duplicate(Invoice $invoice)
     {
         $clone = $invoice->duplicate();
-        return redirect()->route('invoices.edit', $clone)->with('success', "Cloned to new draft {$clone->invoice_number}.");
+        return redirect()->route('invoices.edit', $clone)->with('success', __('app.invoice_cloned', ['number' => $clone->invoice_number]));
     }
 
     public function convert(Invoice $invoice)
     {
         $newInvoice = $invoice->convertQuoteToInvoice();
-        return redirect()->route('invoices.show', $newInvoice)->with('success', "Quote successfully converted to Invoice {$newInvoice->invoice_number}.");
+        return redirect()->route('invoices.show', $newInvoice)->with('success', __('app.quote_converted', ['number' => $newInvoice->invoice_number]));
     }
 
     public function creditNote(Invoice $invoice)
     {
         $creditNote = $invoice->createCreditNote();
-        return redirect()->route('invoices.edit', $creditNote)->with('success', "Created credit note draft {$creditNote->invoice_number}.");
+        return redirect()->route('invoices.edit', $creditNote)->with('success', __('app.credit_note_created', ['number' => $creditNote->invoice_number]));
     }
 
     public function pdf(Invoice $invoice, PdfService $pdfService)
@@ -367,11 +367,25 @@ class InvoiceController extends Controller
         return $pdf->stream($filename);
     }
 
+    public function preview(Invoice $invoice, PdfService $pdfService)
+    {
+        abort_unless($pdfService->supportsTemplate($invoice->pdf_template), 404);
+
+        // Avoid PdfService::generate()'s normal first-or-create profile fallback:
+        // preview is strictly read-only, even in an incompletely initialized database.
+        $profile = BusinessProfile::query()->first();
+        abort_unless($profile, 404);
+
+        $pdf = $pdfService->generate($invoice, $profile);
+
+        return $pdf->stream($pdfService->getFilename($invoice));
+    }
+
     public function sendEmail(Request $request, Invoice $invoice, PdfService $pdfService)
     {
         $recipient = $request->input('email', $invoice->client->email);
         if (empty($recipient)) {
-            return back()->with('error', 'Client has no email configured.');
+            return back()->with('error', __('app.client_has_no_email'));
         }
 
         try {
@@ -387,9 +401,9 @@ class InvoiceController extends Controller
 
             AuditLog::log($invoice->id, 'email_sent', ['recipient' => $recipient]);
 
-            return back()->with('success', "Invoice emailed to {$recipient}.");
+            return back()->with('success', __('app.invoice_emailed', ['email' => $recipient]));
         } catch (\Throwable $e) {
-            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+            return back()->with('error', __('app.invoice_email_failed', ['message' => $e->getMessage()]));
         }
     }
 }

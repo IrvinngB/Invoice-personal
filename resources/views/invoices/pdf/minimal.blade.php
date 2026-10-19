@@ -2,6 +2,7 @@
     $t = function($key) use ($locale) {
         return __("invoice.{$key}", [], $locale);
     };
+    $dateFormat = $locale === 'es' ? 'D [de] MMMM [de] Y' : 'MMMM D, Y';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}">
@@ -41,6 +42,7 @@
                 <div style="color: #71717a;">{{ $profile->email }} · {{ $profile->website }}</div>
             </td>
             <td style="text-align: right;">
+                <div style="font-size: 10px; font-weight: 600; color: #71717a; text-transform: uppercase;">{{ $invoice->type === 'credit_note' ? $t('credit_note') : $t($invoice->type) }}</div>
                 <div style="font-size: 16px; font-weight: 600;">{{ $invoice->invoice_number }}</div>
                 <div style="color: #71717a;">{{ $t('status_' . $invoice->status) }}</div>
             </td>
@@ -58,9 +60,9 @@
         </td>
         <td class="meta-cell">
             <div class="label">{{ $t('issue_date') }}</div>
-            <div>{{ $invoice->issue_date->format('Y-m-d') }}</div>
+            <div>{{ $invoice->issue_date->locale($locale)->isoFormat($dateFormat) }}</div>
             <div class="label" style="margin-top: 8px;">{{ $t('due_date') }}</div>
-            <div>{{ $invoice->due_date->format('Y-m-d') }}</div>
+            <div>{{ $invoice->due_date->locale($locale)->isoFormat($dateFormat) }}</div>
         </td>
         <td class="meta-cell" style="text-align: right;">
             <div class="label">{{ $t('balance_due') }}</div>
@@ -110,7 +112,7 @@
 
 @if($profile->bank_iban || $invoice->payment_link)
 <div style="margin-top: 40px; padding-top: 15px; border-top: 1px solid #f4f4f5; font-size: 9px; color: #71717a;">
-    <div><strong>Payment:</strong> {{ $profile->bank_iban ? 'IBAN: ' . $profile->bank_iban : '' }} {{ $invoice->payment_link ? '· ' . $invoice->payment_link : '' }}</div>
+    <div><strong>{{ $t('payment') }}:</strong> {{ $profile->bank_iban ? $t('iban') . ': ' . $profile->bank_iban : '' }} {{ $invoice->payment_link ? '· ' . $invoice->payment_link : '' }}</div>
 </div>
 @endif
 

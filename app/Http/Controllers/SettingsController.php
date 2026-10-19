@@ -73,6 +73,6 @@ class SettingsController extends Controller
 
         $profile->update($validated);
 
-        return redirect()->route('settings.index')->with('success', 'Business profile & preferences updated.');
+        return redirect()->route('settings.index')->with('success', __('app.profile_updated'));
     }
 }

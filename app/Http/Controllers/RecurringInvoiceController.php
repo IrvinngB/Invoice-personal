@@ -76,7 +76,7 @@ class RecurringInvoiceController extends Controller
             ],
         ]);
 
-        return redirect()->route('recurring.index')->with('success', 'Recurring schedule created.');
+        return redirect()->route('recurring.index')->with('success', __('app.recurring_created'));
     }
 
     public function generateNow(RecurringInvoice $recurring)
@@ -84,16 +84,16 @@ class RecurringInvoiceController extends Controller
         $invoice = $recurring->generateInvoice();
         if (!$invoice) {
             return redirect()->route('recurring.index')
-                ->with('error', "Ya existe una factura activa emitida para {$recurring->client->name} en esa fecha. Se evitó la duplicación automática.");
+                ->with('error', __('app.recurring_duplicate_rejected', ['client' => $recurring->client->name]));
         }
 
         return redirect()->route('invoices.show', $invoice)
-            ->with('success', "Invoice {$invoice->invoice_number} successfully generated from recurring schedule.");
+            ->with('success', __('app.recurring_generated', ['number' => $invoice->invoice_number]));
     }
 
     public function destroy(RecurringInvoice $recurring)
     {
         $recurring->delete();
-        return redirect()->route('recurring.index')->with('success', 'Recurring schedule removed.');
+        return redirect()->route('recurring.index')->with('success', __('app.recurring_removed'));
     }
 }

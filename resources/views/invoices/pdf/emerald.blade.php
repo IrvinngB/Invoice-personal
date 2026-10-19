@@ -12,13 +12,12 @@
         ? ($locale === 'es' ? $invoice->due_date->locale('es')->isoFormat('D [de] MMMM [de] Y') : $invoice->due_date->locale('en')->isoFormat('MMMM D, Y'))
         : null;
 
-    $isQuote = ($invoice->type ?? 'invoice') === 'quote';
-    $docTitle = $isQuote 
-        ? ($locale === 'es' ? 'Cotización de desarrollo web' : 'Web Development Quote') 
-        : ($locale === 'es' ? 'Factura de desarrollo web' : 'Web Development Invoice');
+    $docTitle = $invoice->type === 'quote'
+        ? $t('quote')
+        : ($invoice->type === 'credit_note' ? $t('credit_note') : $t('invoice'));
 
-    $formatMoney = function($cents) use ($invoice) {
-        return $invoice->currency . ' ' . number_format($cents / 100, 2, '.', ',');
+    $formatMoney = function($cents) use ($invoice, $locale) {
+        return \App\Services\InvoiceCalculationService::formatMoney($cents, $invoice->currency, $locale);
     };
 @endphp
 <!DOCTYPE html>
@@ -294,16 +293,16 @@
                 <div class="main-title">{{ $docTitle }}</div>
                 <table class="meta-table">
                     <tr>
-                        <td class="meta-label">{{ $locale === 'es' ? 'Orden de compra número.:' : 'Purchase order no.:' }}</td>
+                        <td class="meta-label">{{ $t('purchase_order_number') }}:</td>
                         <td class="meta-value">{{ $invoice->invoice_number }}</td>
                     </tr>
                     <tr>
-                        <td class="meta-label">{{ $locale === 'es' ? 'Fecha de orden:' : 'Order date:' }}</td>
+                        <td class="meta-label">{{ $t('order_date') }}:</td>
                         <td class="meta-value">{{ $formattedIssueDate }}</td>
                     </tr>
                     @if($formattedDueDate)
                     <tr>
-                        <td class="meta-label">{{ $locale === 'es' ? 'Fecha de vencimiento:' : 'Due date:' }}</td>
+                        <td class="meta-label">{{ $t('due_date') }}:</td>
                         <td class="meta-value">{{ $formattedDueDate }}</td>
                     </tr>
                     @endif
@@ -317,7 +316,7 @@
         <tr>
             <!-- De (Sender) -->
             <td class="party-col-left">
-                <div class="section-label">{{ $locale === 'es' ? 'De' : 'From' }}</div>
+                <div class="section-label">{{ $t('from') }}</div>
                 <div class="party-name">{{ $profile->business_name ?: $profile->owner_name }}</div>
                 @if($profile->owner_name && $profile->owner_name !== $profile->business_name)
                     <div>{{ $profile->owner_name }}</div>
@@ -335,13 +334,13 @@
                     <div>{!! nl2br(e($profile->address)) !!}</div>
                 @endif
                 @if($profile->tax_id)
-                    <div>Cédula / RUC: {{ $profile->tax_id }}</div>
+                    <div>{{ $t('tax_id') }}: {{ $profile->tax_id }}</div>
                 @endif
             </td>
 
             <!-- Cobrar a (Client) -->
             <td class="party-col-right">
-                <div class="section-label">{{ $locale === 'es' ? 'Cobrar a' : 'Bill to' }}</div>
+                <div class="section-label">{{ $t('billed_to') }}</div>
                 <div class="party-name">{{ $client->company ?: $client->name }}</div>
                 @if($client->company && $client->name)
                     <div>{{ $client->name }}</div>
@@ -356,11 +355,11 @@
                     <div>{!! nl2br(e($client->billing_address)) !!}</div>
                 @endif
                 @if($client->tax_id)
-                    <div>RUC: {{ $client->tax_id }}</div>
+                    <div>{{ $t('tax_id') }}: {{ $client->tax_id }}</div>
                 @endif
 
                 @if($client->shipping_address)
-                    <div class="section-label" style="margin-top: 10px;">{{ $locale === 'es' ? 'Envie a' : 'Ship to' }}</div>
+                    <div class="section-label" style="margin-top: 10px;">{{ $t('ship_to') }}</div>
                     <div>{!! nl2br(e($client->shipping_address)) !!}</div>
                 @endif
             </td>
@@ -371,12 +370,12 @@
     <table class="items-table">
         <thead>
             <tr>
-                <th class="col-desc">{{ $locale === 'es' ? 'DESCRIPCIÓN' : 'DESCRIPTION' }}</th>
-                <th class="col-rate">{{ $locale === 'es' ? 'RATE, CADA' : 'RATE, EACH' }}</th>
-                <th class="col-qty">{{ $locale === 'es' ? 'CANTIDAD' : 'QUANTITY' }}</th>
-                <th class="col-tax">{{ $locale === 'es' ? 'FISCAL' : 'TAX' }}</th>
-                <th class="col-disc">{{ $locale === 'es' ? 'DESCT' : 'DISC' }}</th>
-                <th class="col-amount">{{ $locale === 'es' ? 'AMOUNT, CADA' : 'AMOUNT, EACH' }}</th>
+                <th class="col-desc">{{ $t('description') }}</th>
+                <th class="col-rate">{{ $t('rate_each') }}</th>
+                <th class="col-qty">{{ $t('quantity') }}</th>
+                <th class="col-tax">{{ $t('tax') }}</th>
+                <th class="col-disc">{{ $t('discount_abbr') }}</th>
+                <th class="col-amount">{{ $t('amount_each') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -385,8 +384,8 @@
                 $qty = (float) $item->quantity;
                 $formattedQty = ($qty == (int)$qty) ? (string)(int)$qty : rtrim(rtrim(number_format($qty, 2), '0'), '.');
                 $rowClass = ($index % 2 === 0) ? 'row-white' : 'row-shaded';
-                $unitPrice = number_format($item->unit_price_cents / 100, 2, '.', ',');
-                $lineTotal = number_format($item->total_cents / 100, 2, '.', ',');
+                $unitPrice = $formatMoney($item->unit_price_cents);
+                $lineTotal = $formatMoney($item->total_cents);
                 $taxPct = number_format(($item->tax_rate_bps ?? 0) / 100, 2) . '%';
                 $discPct = number_format(($item->discount_bps ?? 0) / 100, 2) . '%';
             @endphp
@@ -412,29 +411,29 @@
         <tr>
             <!-- Left Column: Instructions and Notes -->
             <td class="bottom-left-col">
-                <div class="block-title">{{ $locale === 'es' ? 'Instrucciones de pago' : 'Payment Instructions' }}</div>
+                <div class="block-title">{{ $t('payment_instructions') }}</div>
 
                 @if($profile->paypal_email)
-                    <div class="info-row-label">E-mail de Paypal</div>
+                    <div class="info-row-label">{{ $t('paypal_email') }}</div>
                     <div class="info-row-val">{{ $profile->paypal_email }}</div>
                 @endif
 
                 @if($profile->bank_account_name || $profile->owner_name)
-                    <div class="info-row-label">{{ $locale === 'es' ? 'Cheques a nombre de' : 'Checks payable to' }}</div>
+                    <div class="info-row-label">{{ $t('checks_payable_to') }}</div>
                     <div class="info-row-val">{{ $profile->bank_account_name ?: $profile->owner_name }}</div>
                 @endif
 
                 @if($profile->bank_name || $profile->bank_iban)
-                    <div class="info-row-label">{{ $locale === 'es' ? 'Transferencia bancaria' : 'Bank Transfer' }}</div>
+                    <div class="info-row-label">{{ $t('bank_transfer') }}</div>
                     <div class="info-row-val">
                         @if($profile->bank_name)
                             {{ $profile->bank_name }}<br>
                         @endif
                         @if($profile->bank_iban)
-                            {{ $locale === 'es' ? 'Cuenta / Cédula ACH:' : 'Account / IBAN:' }} {{ $profile->bank_iban }}<br>
+                            {{ $t('account_iban') }}: {{ $profile->bank_iban }}<br>
                         @endif
                         @if($profile->bank_swift)
-                            {{ $locale === 'es' ? 'Enrutamiento (ABA/SWIFT):' : 'Routing (ABA/SWIFT):' }} {{ $profile->bank_swift }}
+                            {{ $t('routing') }}: {{ $profile->bank_swift }}
                         @endif
                     </div>
                 @endif
@@ -446,7 +445,7 @@
                 @endif
 
                 @if($invoice->notes || $profile->default_notes)
-                    <div class="block-title" style="margin-top: 14px;">{{ $locale === 'es' ? 'Notas' : 'Notes' }}</div>
+                    <div class="block-title" style="margin-top: 14px;">{{ $t('notes') }}</div>
                     <div class="info-row-val" style="line-height: 1.45;">
                         {!! nl2br(e($invoice->notes ?: $profile->default_notes)) !!}
                     </div>
@@ -457,31 +456,31 @@
             <td class="bottom-right-col">
                 <table class="breakdown-table">
                     <tr>
-                        <td class="breakdown-label bold">{{ $locale === 'es' ? 'Total parcial:' : 'Subtotal:' }}</td>
+                        <td class="breakdown-label bold">{{ $t('subtotal') }}:</td>
                         <td class="breakdown-value bold">{{ $formatMoney($invoice->subtotal_cents) }}</td>
                     </tr>
                     @if($invoice->discount_total_cents > 0)
                     <tr>
-                        <td class="breakdown-label">{{ $locale === 'es' ? 'Descuento:' : 'Discount:' }}</td>
+                        <td class="breakdown-label">{{ $t('discount') }}:</td>
                         <td class="breakdown-value">-{{ $formatMoney($invoice->discount_total_cents) }}</td>
                     </tr>
                     @endif
                     @if($invoice->shipping_fee_cents > 0)
                     <tr>
-                        <td class="breakdown-label">{{ $locale === 'es' ? 'Costo de envío:' : 'Shipping fee:' }}</td>
+                        <td class="breakdown-label">{{ $t('shipping_fee') }}:</td>
                         <td class="breakdown-value">{{ $formatMoney($invoice->shipping_fee_cents) }}</td>
                     </tr>
                     @endif
                     <tr>
-                        <td class="breakdown-label">{{ $locale === 'es' ? 'Impuesto de venta:' : 'Sales tax:' }}</td>
+                        <td class="breakdown-label">{{ $t('sales_tax') }}:</td>
                         <td class="breakdown-value">{{ $formatMoney($invoice->tax_total_cents) }}</td>
                     </tr>
                     <tr>
-                        <td class="breakdown-label bold" style="padding-top: 6px;">{{ $locale === 'es' ? 'Total:' : 'Total:' }}</td>
+                        <td class="breakdown-label bold" style="padding-top: 6px;">{{ $t('total') }}:</td>
                         <td class="breakdown-value bold" style="padding-top: 6px; font-size: 11.5px;">{{ $formatMoney($invoice->total_cents) }}</td>
                     </tr>
                     <tr>
-                        <td class="breakdown-label">{{ $locale === 'es' ? 'Cantidad pagada:' : 'Amount paid:' }}</td>
+                        <td class="breakdown-label">{{ $t('amount_paid') }}:</td>
                         <td class="breakdown-value">{{ $formatMoney($invoice->amount_paid_cents) }}</td>
                     </tr>
                 </table>
@@ -489,7 +488,7 @@
                 <!-- Balance Due Box -->
                 <table class="balance-container">
                     <tr>
-                        <td class="balance-label">{{ $locale === 'es' ? 'Saldo adeudado:' : 'Balance due:' }}</td>
+                        <td class="balance-label">{{ $t('balance_due') }}:</td>
                         <td class="balance-amount">{{ $formatMoney($invoice->balance_cents) }}</td>
                     </tr>
                 </table>

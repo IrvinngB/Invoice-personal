@@ -10,11 +10,11 @@
         <div>
             <div class="flex items-center space-x-2">
                 <a href="{{ route('invoices.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition">
-                    &larr; Invoices
+                    &larr; {{ __('app.back_to_invoices') }}
                 </a>
                 <span class="text-xs text-slate-400">/</span>
                 <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    {{ $invoice->type }}
+                    {{ __('invoice.' . $invoice->type) }}
                 </span>
             </div>
             <div class="flex items-center space-x-3 mt-1">
@@ -33,19 +33,23 @@
                     };
                 @endphp
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border {{ $badgeClasses }}">
-                    {{ $invoice->status }}
+                    {{ __('app.' . ($invoice->status === 'void' ? 'void_status' : $invoice->status)) }}
                 </span>
             </div>
         </div>
 
         <!-- Buttons Toolbar -->
         <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('invoices.preview', $invoice) }}" target="_blank" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition flex items-center" aria-label="{{ __('app.preview_invoice') }}">
+                {{ __('app.preview') }}
+            </a>
+
             <!-- Download PDF -->
             <a href="{{ route('invoices.pdf', $invoice) }}" target="_blank" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition flex items-center">
                 <svg class="w-4 h-4 mr-1.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                PDF / Print
+                {{ __('app.pdf_print') }}
             </a>
 
             <!-- Send by Email -->
@@ -53,7 +57,7 @@
                 <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                Email
+                {{ __('app.email') }}
             </button>
 
             <!-- Record Payment (if invoice and not paid/void) -->
@@ -62,19 +66,19 @@
                 <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                Record Payment
+                {{ __('app.record_payment') }}
             </button>
             @endif
 
             <!-- Edit (only if draft) -->
             @if(!$invoice->isLocked())
             <a href="{{ route('invoices.edit', $invoice) }}" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
-                Edit Draft
+                {{ __('app.edit_draft') }}
             </a>
             <form method="POST" action="{{ route('invoices.finalize', $invoice) }}" class="inline">
                 @csrf
                 <button type="submit" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-100 transition">
-                    Finalize & Lock
+                    {{ __('app.finalize_lock') }}
                 </button>
             </form>
             @endif
@@ -84,7 +88,7 @@
             <form method="POST" action="{{ route('invoices.convert', $invoice) }}" class="inline">
                 @csrf
                 <button type="submit" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition active:scale-95">
-                    Convert to Invoice
+                    {{ __('app.convert_invoice') }}
                 </button>
             </form>
             @endif
@@ -94,7 +98,7 @@
             <form method="POST" action="{{ route('invoices.credit-note', $invoice) }}" class="inline">
                 @csrf
                 <button type="submit" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition">
-                    Issue Credit Note
+                    {{ __('app.credit_note') }}
                 </button>
             </form>
             @endif
@@ -103,14 +107,14 @@
             <form method="POST" action="{{ route('invoices.duplicate', $invoice) }}" class="inline">
                 @csrf
                 <button type="submit" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition">
-                    Duplicate
+                    {{ __('app.duplicate') }}
                 </button>
             </form>
 
             <!-- Void Button -->
             @if(!$invoice->isVoid())
             <button type="button" @click="voidModal = true" class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
-                Void
+                {{ __('app.void') }}
             </button>
             @endif
         </div>
@@ -122,7 +126,7 @@
             <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            <span><strong>Locked document:</strong> This document is finalized. Direct modifications are disallowed to protect audit integrity. Use Duplicate or Credit Note for revisions.</span>
+            <span><strong>{{ __('app.locked_document') }}</strong> {{ __('app.locked_document_message') }}</span>
         </div>
     </div>
     @endif
@@ -136,7 +140,7 @@
                 <div class="text-xl font-bold text-slate-900 dark:text-white">{{ $profile->business_name }}</div>
                 <div class="text-xs text-slate-500 mt-1 leading-relaxed">
                     @if($profile->owner_name) <div>{{ $profile->owner_name }}</div> @endif
-                    @if($profile->tax_id) <div>Tax ID: {{ $profile->tax_id }}</div> @endif
+                    @if($profile->tax_id) <div>{{ __('app.tax_id') }}: {{ $profile->tax_id }}</div> @endif
                     <div>{!! nl2br(e($profile->address)) !!}</div>
                     @if($profile->email) <div>{{ $profile->email }}</div> @endif
                 </div>
@@ -144,15 +148,15 @@
 
             <div class="text-left sm:text-right">
                 <div class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                    {{ $invoice->type === 'quote' ? 'Estimate / Quote' : ($invoice->type === 'credit_note' ? 'Credit Note' : 'Invoice') }}
+                    {{ __('invoice.' . $invoice->type) }}
                 </div>
                 <div class="text-sm font-bold text-blue-600 dark:text-blue-400 mt-0.5">{{ $invoice->invoice_number }}</div>
 
                 <div class="text-xs text-slate-500 mt-4 space-y-1">
-                    <div><span class="text-slate-400">Issue Date:</span> <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->issue_date->format('M d, Y') }}</strong></div>
-                    <div><span class="text-slate-400">Due Date:</span> <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->due_date->format('M d, Y') }}</strong></div>
+                    <div><span class="text-slate-400">{{ __('app.issue_date') }}:</span> <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->issue_date->locale(app()->getLocale())->isoFormat('ll') }}</strong></div>
+                    <div><span class="text-slate-400">{{ __('app.due_date') }}:</span> <strong class="text-slate-800 dark:text-slate-200">{{ $invoice->due_date->locale(app()->getLocale())->isoFormat('ll') }}</strong></div>
                     @if($invoice->parentInvoice)
-                        <div><span class="text-slate-400">Ref Doc:</span> <a href="{{ route('invoices.show', $invoice->parentInvoice) }}" class="text-blue-600 hover:underline">{{ $invoice->parentInvoice->invoice_number }}</a></div>
+                        <div><span class="text-slate-400">{{ __('app.reference_document') }}:</span> <a href="{{ route('invoices.show', $invoice->parentInvoice) }}" class="text-blue-600 hover:underline">{{ $invoice->parentInvoice->invoice_number }}</a></div>
                     @endif
                 </div>
             </div>
@@ -161,23 +165,23 @@
         <!-- Billed to & Terms -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 border-b border-slate-200 dark:border-slate-800 pb-8">
             <div>
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Billed To</div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{{ __('app.billed_to') }}</div>
                 <div class="text-sm font-bold text-slate-900 dark:text-white">{{ $invoice->client->company ?: $invoice->client->name }}</div>
                 <div class="text-xs text-slate-500 mt-1 leading-relaxed">
                     @if($invoice->client->company && $invoice->client->name !== $invoice->client->company)
-                        <div>Attn: {{ $invoice->client->name }}</div>
+                        <div>{{ __('app.attention') }}: {{ $invoice->client->name }}</div>
                     @endif
-                    @if($invoice->client->tax_id) <div>Tax ID: {{ $invoice->client->tax_id }}</div> @endif
+                    @if($invoice->client->tax_id) <div>{{ __('app.tax_id') }}: {{ $invoice->client->tax_id }}</div> @endif
                     @if($invoice->client->billing_address) <div>{!! nl2br(e($invoice->client->billing_address)) !!}</div> @endif
                     @if($invoice->client->email) <div>{{ $invoice->client->email }}</div> @endif
                 </div>
             </div>
 
             <div class="text-left sm:text-right">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Payment Terms & Currency</div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">{{ __('app.payment_terms_currency') }}</div>
                 <div class="text-xs text-slate-700 dark:text-slate-300">
-                    <div>Currency: <strong class="text-slate-900 dark:text-white">{{ $invoice->currency }}</strong> @if($invoice->exchange_rate != 1.0) (Rate: {{ $invoice->exchange_rate }}) @endif</div>
-                    <div class="mt-1 text-slate-500">{{ $invoice->payment_terms ?: 'Payment due within 14 days' }}</div>
+                    <div>{{ __('app.currency') }}: <strong class="text-slate-900 dark:text-white">{{ $invoice->currency }}</strong> @if($invoice->exchange_rate != 1.0) ({{ __('app.rate') }}: {{ $invoice->exchange_rate }}) @endif</div>
+                    <div class="mt-1 text-slate-500">{{ $invoice->payment_terms ?: __('app.payment_due_in_days') }}</div>
                 </div>
             </div>
         </div>
@@ -187,13 +191,13 @@
             <table class="w-full text-left text-xs border-collapse">
                 <thead>
                     <tr class="border-b-2 border-slate-200 dark:border-slate-700 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                        <th class="py-2.5 px-3">Description</th>
-                        <th class="py-2.5 px-3 text-center">Qty</th>
-                        <th class="py-2.5 px-3 text-right">Unit Price</th>
+                        <th class="py-2.5 px-3">{{ __('invoice.description') }}</th>
+                        <th class="py-2.5 px-3 text-center">{{ __('invoice.qty') }}</th>
+                        <th class="py-2.5 px-3 text-right">{{ __('app.unit_price') }}</th>
                         @if($invoice->tax_total_cents > 0)
-                            <th class="py-2.5 px-3 text-right">Tax Rate</th>
+                            <th class="py-2.5 px-3 text-right">{{ __('app.tax_rate') }}</th>
                         @endif
-                        <th class="py-2.5 px-3 text-right">Line Total</th>
+                        <th class="py-2.5 px-3 text-right">{{ __('app.line_total') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -203,7 +207,7 @@
                             <div class="font-bold text-slate-900 dark:text-white">{{ $item->description }}</div>
                             @if($item->discount_bps > 0)
                                 <div class="text-[10px] text-emerald-600 dark:text-emerald-400">
-                                    Discount: {{ $item->discount_bps / 100 }}% (-{{ \App\Services\InvoiceCalculationService::formatMoney($item->discount_amount_cents, $invoice->currency) }})
+                                    {{ __('app.discount') }}: {{ $item->discount_bps / 100 }}% (-{{ \App\Services\InvoiceCalculationService::formatMoney($item->discount_amount_cents, $invoice->currency) }})
                                 </div>
                             @endif
                         </td>
@@ -232,15 +236,15 @@
             <div>
                 @if($profile->bank_iban || $invoice->payment_link)
                 <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs space-y-1.5">
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Payment Instructions</div>
-                    @if($profile->bank_name) <div>Bank: <strong>{{ $profile->bank_name }}</strong></div> @endif
-                    @if($profile->bank_iban) <div>IBAN: <strong>{{ $profile->bank_iban }}</strong></div> @endif
-                    @if($profile->bank_swift) <div>SWIFT/BIC: <strong>{{ $profile->bank_swift }}</strong></div> @endif
-                    @if($profile->paypal_email) <div>PayPal: <strong>{{ $profile->paypal_email }}</strong></div> @endif
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('invoice.payment_instructions') }}</div>
+                    @if($profile->bank_name) <div>{{ __('app.bank') }}: <strong>{{ $profile->bank_name }}</strong></div> @endif
+                    @if($profile->bank_iban) <div>{{ __('invoice.iban') }}: <strong>{{ $profile->bank_iban }}</strong></div> @endif
+                    @if($profile->bank_swift) <div>{{ __('invoice.swift_bic') }}: <strong>{{ $profile->bank_swift }}</strong></div> @endif
+                    @if($profile->paypal_email) <div>{{ __('invoice.paypal') }}: <strong>{{ $profile->paypal_email }}</strong></div> @endif
                     @if($invoice->payment_link)
                         <div class="pt-1">
                             <a href="{{ $invoice->payment_link }}" target="_blank" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline inline-flex items-center">
-                                Pay Online via Stripe &rarr;
+                                {{ __('invoice.payment_link') }} &rarr;
                             </a>
                         </div>
                     @endif
@@ -250,42 +254,42 @@
 
             <div class="space-y-2 text-xs">
                 <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Subtotal:</span>
+                    <span>{{ __('invoice.subtotal') }}:</span>
                     <span class="font-semibold text-slate-900 dark:text-white">{{ $invoice->formatted_subtotal }}</span>
                 </div>
                 @if($invoice->discount_total_cents > 0)
                 <div class="flex justify-between text-emerald-600 dark:text-emerald-400">
-                    <span>Discounts:</span>
+                    <span>{{ __('app.discount') }}:</span>
                     <span class="font-semibold">-{{ $invoice->formatted_discount_total }}</span>
                 </div>
                 @endif
                 @if($invoice->tax_total_cents > 0)
                 <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Tax ({{ $invoice->tax_inclusive ? 'Inclusive' : 'Exclusive' }}):</span>
+                    <span>{{ __('invoice.tax') }} ({{ $invoice->tax_inclusive ? __('app.inclusive') : __('app.exclusive') }}):</span>
                     <span class="font-semibold text-slate-900 dark:text-white">{{ $invoice->formatted_tax_total }}</span>
                 </div>
                 @endif
                 @if($invoice->shipping_fee_cents > 0)
                 <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Shipping / Fees:</span>
+                    <span>{{ __('invoice.shipping_handling') }}:</span>
                     <span class="font-semibold text-slate-900 dark:text-white">{{ $invoice->formatted_shipping_fee }}</span>
                 </div>
                 @endif
 
                 <div class="pt-2 border-t-2 border-slate-200 dark:border-slate-700 flex justify-between items-baseline">
-                    <span class="text-sm font-bold text-slate-900 dark:text-white">Total:</span>
+                    <span class="text-sm font-bold text-slate-900 dark:text-white">{{ __('invoice.total') }}:</span>
                     <span class="text-lg font-black text-slate-900 dark:text-white">{{ $invoice->formatted_total }}</span>
                 </div>
 
                 @if($invoice->amount_paid_cents > 0)
                 <div class="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
-                    <span>Amount Paid:</span>
+                    <span>{{ __('invoice.amount_paid') }}:</span>
                     <span>-{{ $invoice->formatted_amount_paid }}</span>
                 </div>
                 @endif
 
                 <div class="p-3 bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-100 dark:border-blue-900/60 flex justify-between items-center text-blue-900 dark:text-blue-200 font-bold">
-                    <span>Balance Due:</span>
+                    <span>{{ __('invoice.balance_due') }}:</span>
                     <span class="text-base">{{ $invoice->formatted_balance }}</span>
                 </div>
             </div>
@@ -293,7 +297,7 @@
 
         @if($invoice->notes)
         <div class="pt-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400">
-            <div class="font-bold text-slate-700 dark:text-slate-300 mb-1">Notes:</div>
+            <div class="font-bold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.notes') }}:</div>
             <div>{!! nl2br(e($invoice->notes)) !!}</div>
         </div>
         @endif
@@ -306,12 +310,12 @@
         <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Payments Ledger</h3>
-                    <p class="text-xs text-slate-400">{{ count($invoice->payments) }} recorded payments</p>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.payments_ledger') }}</h3>
+                    <p class="text-xs text-slate-400">{{ trans_choice('app.recorded_payments_count', count($invoice->payments), ['count' => count($invoice->payments)]) }}</p>
                 </div>
                 @if($invoice->type === 'invoice' && !$invoice->isPaid() && !$invoice->isVoid())
                 <button type="button" @click="paymentModal = true" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition">
-                    + Record Payment
+                    + {{ __('app.record_payment') }}
                 </button>
                 @endif
             </div>
@@ -320,25 +324,25 @@
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase font-bold text-slate-400">
-                            <th class="py-2">Date</th>
-                            <th class="py-2">Method</th>
-                            <th class="py-2">Ref</th>
-                            <th class="py-2 text-right">Amount</th>
+                            <th class="py-2">{{ __('app.date') }}</th>
+                            <th class="py-2">{{ __('app.payment_method') }}</th>
+                            <th class="py-2">{{ __('app.reference') }}</th>
+                            <th class="py-2 text-right">{{ __('invoice.amount') }}</th>
                             <th class="py-2 text-right"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($invoice->payments as $payment)
                         <tr>
-                            <td class="py-2.5 font-medium text-slate-800 dark:text-slate-200">{{ $payment->payment_date->format('M d, Y') }}</td>
-                            <td class="py-2.5 text-slate-500 uppercase text-[10px]">{{ str_replace('_', ' ', $payment->method) }}</td>
+                            <td class="py-2.5 font-medium text-slate-800 dark:text-slate-200">{{ $payment->payment_date->locale(app()->getLocale())->isoFormat('ll') }}</td>
+                            <td class="py-2.5 text-slate-500 uppercase text-[10px]">{{ __('app.payment_method_' . $payment->method) }}</td>
                             <td class="py-2.5 text-slate-400">{{ $payment->reference ?: '-' }}</td>
                             <td class="py-2.5 text-right font-bold text-emerald-600 dark:text-emerald-400">{{ $payment->formatted_amount }}</td>
                             <td class="py-2.5 text-right">
-                                <form method="POST" action="{{ route('payments.destroy', $payment) }}" onsubmit="return confirm('Delete this payment and restore invoice balance?');" class="inline">
+                                <form method="POST" action="{{ route('payments.destroy', $payment) }}" onsubmit="return confirm('{{ __('app.delete_payment_confirmation') }}');" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-slate-400 hover:text-rose-500 transition" title="Delete Payment">
+                                    <button type="submit" class="text-slate-400 hover:text-rose-500 transition" title="{{ __('app.delete_payment') }}">
                                         <svg class="w-4 h-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -348,7 +352,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="py-4 text-center text-slate-400 text-xs">No payments recorded yet.</td>
+                            <td colspan="5" class="py-4 text-center text-slate-400 text-xs">{{ __('app.no_payments') }}</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -359,25 +363,29 @@
         <!-- Audit Trail Log -->
         <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
             <div>
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Audit Trail</h3>
-                <p class="text-xs text-slate-400">Immutable change log for compliance and integrity</p>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">{{ __('app.audit_trail') }}</h3>
+                <p class="text-xs text-slate-400">{{ __('app.audit_trail_description') }}</p>
             </div>
 
             <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
                 @forelse($invoice->auditLogs as $log)
+                @php
+                    $auditEventKey = 'app.audit_event_' . $log->event;
+                    $auditEventLabel = __($auditEventKey);
+                @endphp
                 <div class="flex items-start space-x-3 text-xs">
                     <div class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
                     <div class="flex-1">
                         <div class="font-semibold text-slate-800 dark:text-slate-200">
-                            {{ ucfirst(str_replace('_', ' ', $log->event)) }}
+                            {{ $auditEventLabel === $auditEventKey ? ucfirst(str_replace('_', ' ', $log->event)) : $auditEventLabel }}
                         </div>
                         <div class="text-[10px] text-slate-400">
-                            {{ $log->created_at->format('M d, Y H:i:s') }} · IP: {{ $log->user_ip ?: 'Local' }}
+                            {{ $log->created_at->locale(app()->getLocale())->isoFormat('lll') }} · IP: {{ $log->user_ip ?: __('app.local') }}
                         </div>
                     </div>
                 </div>
                 @empty
-                <div class="text-xs text-slate-400">No events logged yet.</div>
+                <div class="text-xs text-slate-400">{{ __('app.no_audit_events') }}</div>
                 @endforelse
             </div>
         </div>
@@ -388,51 +396,51 @@
     <div x-show="paymentModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" x-cloak>
         <div @click.away="paymentModal = false" class="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">Record Payment</h3>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">{{ __('app.record_payment') }}</h3>
                 <button type="button" @click="paymentModal = false" class="text-slate-400 hover:text-slate-600">&times;</button>
             </div>
 
             <form method="POST" action="{{ route('invoices.payments.store', $invoice) }}" class="space-y-3">
                 @csrf
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Amount ({{ $invoice->currency }})</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('invoice.amount') }} ({{ $invoice->currency }})</label>
                     <input type="number" step="0.01" min="0.01" name="amount" value="{{ number_format($invoice->balance_cents / 100, 2, '.', '') }}" required
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold">
-                    <span class="text-[10px] text-slate-400">Remaining Balance: {{ $invoice->formatted_balance }}</span>
+                    <span class="text-[10px] text-slate-400">{{ __('app.remaining_balance') }}: {{ $invoice->formatted_balance }}</span>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Payment Date</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.payment_date') }}</label>
                     <input type="date" name="payment_date" value="{{ date('Y-m-d') }}" required
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Payment Method</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.payment_method') }}</label>
                     <select name="method" required class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
-                        <option value="bank_transfer">Bank Wire / Transfer</option>
-                        <option value="stripe_link">Stripe / Online Card</option>
-                        <option value="paypal">PayPal</option>
-                        <option value="cash">Cash</option>
-                        <option value="other">Other</option>
+                        <option value="bank_transfer">{{ __('app.payment_method_bank_transfer') }}</option>
+                        <option value="stripe_link">{{ __('app.payment_method_stripe_link') }}</option>
+                        <option value="paypal">{{ __('app.payment_method_paypal') }}</option>
+                        <option value="cash">{{ __('app.payment_method_cash') }}</option>
+                        <option value="other">{{ __('app.payment_method_other') }}</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Reference / Transaction ID</label>
-                    <input type="text" name="reference" placeholder="e.g. WIRE-894102 or pi_9918"
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.payment_reference') }}</label>
+                    <input type="text" name="reference" placeholder="{{ __('app.payment_reference_placeholder') }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Notes</label>
-                    <input type="text" name="notes" placeholder="Optional notes..."
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.notes') }}</label>
+                    <input type="text" name="notes" placeholder="{{ __('app.optional_notes') }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
 
                 <div class="pt-3 flex justify-end space-x-2">
-                    <button type="button" @click="paymentModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md">Confirm Payment</button>
+                    <button type="button" @click="paymentModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{{ __('app.cancel') }}</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md">{{ __('app.confirm_payment') }}</button>
                 </div>
             </form>
         </div>
@@ -442,24 +450,24 @@
     <div x-show="emailModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" x-cloak>
         <div @click.away="emailModal = false" class="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">Email {{ $invoice->invoice_number }}</h3>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">{{ __('app.email') }} {{ $invoice->invoice_number }}</h3>
                 <button type="button" @click="emailModal = false" class="text-slate-400 hover:text-slate-600">&times;</button>
             </div>
 
             <form method="POST" action="{{ route('invoices.send-email', $invoice) }}" class="space-y-3">
                 @csrf
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Recipient Email</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.recipient_email') }}</label>
                     <input type="email" name="email" value="{{ $invoice->client->email }}" required
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium">
                 </div>
                 <div class="text-[11px] text-slate-400 leading-relaxed">
-                    The PDF invoice will be automatically generated and attached to this email. You can configure custom SMTP credentials in Studio Settings.
+                    {{ __('app.payment_email_description') }}
                 </div>
 
                 <div class="pt-3 flex justify-end space-x-2">
-                    <button type="button" @click="emailModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md">Send Email Now</button>
+                    <button type="button" @click="emailModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{{ __('app.cancel') }}</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md">{{ __('app.send_email_now') }}</button>
                 </div>
             </form>
         </div>
@@ -468,18 +476,18 @@
     <!-- Void Modal -->
     <div x-show="voidModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" x-cloak>
         <div @click.away="voidModal = false" class="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
-            <h3 class="text-base font-bold text-rose-600 dark:text-rose-400">Void Document</h3>
-            <p class="text-xs text-slate-500">Voiding marks this invoice as cancelled and preserves the number in your sequence without gaps.</p>
+            <h3 class="text-base font-bold text-rose-600 dark:text-rose-400">{{ __('app.void_document') }}</h3>
+            <p class="text-xs text-slate-500">{{ __('app.void_document_description') }}</p>
             <form method="POST" action="{{ route('invoices.void', $invoice) }}" class="space-y-3">
                 @csrf
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Reason for Voiding</label>
-                    <input type="text" name="reason" placeholder="e.g. Cancelled by client, duplicated error" required
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.void_reason') }}</label>
+                    <input type="text" name="reason" placeholder="{{ __('app.void_reason_placeholder') }}" required
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div class="pt-3 flex justify-end space-x-2">
-                    <button type="button" @click="voidModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Cancel</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700">Confirm Void</button>
+                    <button type="button" @click="voidModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{{ __('app.cancel') }}</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700">{{ __('app.confirm_void') }}</button>
                 </div>
             </form>
         </div>

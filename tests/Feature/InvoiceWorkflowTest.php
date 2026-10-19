@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Mail\InvoiceMail;
 use App\Models\BusinessProfile;
+use App\Models\AuditLog;
 use App\Models\CatalogItem;
 use App\Models\Client;
 use App\Models\Invoice;
@@ -157,6 +159,52 @@ class InvoiceWorkflowTest extends TestCase
 
         $this->artisan('invoices:generate-recurring')->assertSuccessful();
         $this->assertEquals(3, Invoice::count());
+    }
+
+    public function test_invoice_mail_uses_the_persisted_invoice_locale_not_the_session_locale(): void
+    {
+        app()->setLocale('en');
+        $client = Client::create(['name' => 'Ana Cliente', 'email' => 'ana@example.test']);
+        $invoice = Invoice::create([
+            'invoice_number' => 'INV-ES-MAIL',
+            'type' => 'invoice',
+            'client_id' => $client->id,
+            'issue_date' => '2026-10-18',
+            'due_date' => '2026-11-01',
+            'currency' => 'USD',
+            'locale' => 'es',
+            'balance_cents' => 123456,
+        ]);
+        $invoice->items()->create([
+            'description' => 'Servicio',
+            'quantity' => 1,
+            'unit' => 'hora',
+            'unit_price_cents' => 123456,
+            'total_cents' => 123456,
+        ]);
+        $invoice->recalculateTotals()->refresh();
+
+        app()->setLocale('es');
+        $mail = new InvoiceMail($invoice, '%PDF-test', 'invoice.pdf');
+
+        $this->assertStringContainsString('FACTURA', $mail->envelope()->subject);
+        $this->assertStringContainsString('Hola Ana Cliente', $mail->render());
+        $this->assertStringContainsString('1 de noviembre de 2026', $mail->render());
+        $this->assertStringContainsString('$1.234,56', $mail->render());
+
+        $html = view('invoices.pdf.modern', [
+            'invoice' => $invoice,
+            'profile' => BusinessProfile::current(),
+            'client' => $client,
+            'items' => $invoice->items,
+            'payments' => $invoice->payments,
+            'qrCodeSvg' => null,
+            'locale' => $invoice->locale,
+        ])->render();
+
+        $this->assertStringContainsString('FACTURA', $html);
+        $this->assertStringContainsString('18 de octubre de 2026', $html);
+        $this->assertStringContainsString('$1.234,56', $html);
     }
 
     public function test_duplicate_invoice_guard_for_same_client(): void
@@ -336,9 +384,12 @@ class InvoiceWorkflowTest extends TestCase
         ]);
         $invoice->recalculateTotals();
 
+        $auditCount = AuditLog::count();
         $response = $this->get(route('invoices.pdf', $invoice));
         $response->assertStatus(200);
         $this->assertEquals('application/pdf', $response->headers->get('content-type'));
+        $this->assertSame($auditCount + 1, AuditLog::count());
+        $this->assertDatabaseHas('audit_logs', ['invoice_id' => $invoice->id, 'event' => 'pdf_downloaded']);
     }
 
     public function test_settings_update_handles_default_locale(): void
