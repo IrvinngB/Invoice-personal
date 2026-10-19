@@ -340,6 +340,7 @@
                                     <option value="{{ $tplKey }}">{{ $tplLabel }}</option>
                                 @endforeach
                             </select>
+                            <a href="{{ route('settings.themes.index') }}" target="_blank" class="inline-block mt-1 text-[10px] font-semibold text-blue-600 hover:underline">{{ __('app.themes_manage') }} &rarr;</a>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2">

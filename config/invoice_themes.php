@@ -54,12 +54,12 @@ return [
 
         'classic' => array_replace($base, [
             'font' => 'Times',
-            'accent' => '#1f2a44',
-            'accent_soft' => '#f1f2f6',
-            'ink' => '#111827',
-            'text' => '#1f2937',
-            'muted' => '#4b5563',
-            'line' => '#9ca3af',
+            'accent' => '#5b21b6',
+            'accent_soft' => '#f3eefc',
+            'ink' => '#1e1033',
+            'text' => '#2b2140',
+            'muted' => '#5b5470',
+            'line' => '#a89fbd',
             'surface' => '#ffffff',
             'size' => ['base' => 10.5, 'small' => 9, 'label' => 8, 'title' => 22, 'total' => 14, 'name' => 18],
             'radius' => 0,

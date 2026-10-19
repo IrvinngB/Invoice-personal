@@ -198,7 +198,7 @@ return [
     'invoice_sequence' => 'Secuencia de facturas', 'quote_sequence' => 'Secuencia de presupuestos', 'credit_notes' => 'Notas de crédito',
     'prefix_optional' => 'Prefijo (opcional)', 'digits' => 'Dígitos', 'next_number' => 'Próximo n.º',
     'pdf_template' => 'Plantilla PDF', 'paper_size' => 'Tamaño de papel', 'default_language' => 'Idioma predeterminado',
-    'template_modern' => 'Moderna', 'template_emerald' => 'Esmeralda (estilo Irvin Benitez)', 'template_classic' => 'Clásica formal', 'template_minimal' => 'Minimalista',
+    'template_modern' => 'Moderna', 'template_emerald' => 'Esmeralda', 'template_classic' => 'Clásica formal', 'template_minimal' => 'Minimalista',
     'save_profile_changes' => 'Guardar todos los cambios del perfil', 'backups_exports' => 'Copias de seguridad y exportaciones de datos',
     'backups_exports_subtitle' => 'Instantáneas de SQLite, exportación JSON y hojas de cálculo de impuestos con un clic.',
     'download_snapshot' => 'Descargar instantánea de la base de datos (.sqlite)', 'download_snapshot_description' => 'Instantánea completa de SQLite con todos los registros, facturas y registros de auditoría.',
@@ -392,4 +392,5 @@ return [
     'theme_scale_compact' => 'Compacto',
     'theme_scale_normal' => 'Normal',
     'theme_scale_large' => 'Grande',
+    'signature_missing' => 'Todavía no subiste una firma',
 ];

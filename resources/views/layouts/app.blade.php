@@ -29,28 +29,27 @@
         .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-[#071F1F] dark:text-[#E8F5F0] min-h-screen font-sans antialiased transition-colors duration-200">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-200">
 
     <!-- Top Navigation -->
-    <header class="sticky top-0 z-40 bg-white/80 dark:bg-[#0A2E2E]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Brand / Logo -->
                 <div class="flex items-center space-x-6">
                     <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
                         <div class="h-10 w-10 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                            <svg viewBox="15 14 70 70" class="h-9 w-auto" role="img" aria-label="Irvin Benitez">
-                                <circle cx="27" cy="28" r="8" fill="#BBD94E"/>
-                                <rect x="20" y="44" width="14" height="36" rx="7" fill="#3FA35B"/>
-                                <rect x="44" y="18" width="14" height="62" rx="7" fill="#3FA35B"/>
-                                <path fill-rule="evenodd" d="M44 62a18 18 0 1 0 36 0a18 18 0 1 0-36 0ZM55 62a7 7 0 1 0 14 0a7 7 0 1 0-14 0Z" fill="#3FA35B"/>
+                            <svg viewBox="0 0 24 24" class="h-8 w-8 text-slate-900 dark:text-white" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true">
+                                <path d="M7 3h7l5 5v13H7z"/>
+                                <path d="M14 3v5h5"/>
+                                <path d="M10 13h6M10 17h6"/>
                             </svg>
                         </div>
                         <div>
-                            <span class="text-base font-bold tracking-tight text-slate-900 dark:text-[#E8F5F0] block leading-tight font-display">
-                                {{ \App\Models\BusinessProfile::current()->business_name ?: 'Irvin Benitez' }}
+                            <span class="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 block leading-tight font-display">
+                                {{ \App\Models\BusinessProfile::current()->business_name ?: 'Invoice Studio' }}
                             </span>
-                            <span class="text-xs text-[#3FA35B] dark:text-[#B4D333] block leading-tight font-semibold">{{ __('app.studio_name') }}</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400 block leading-tight font-semibold">{{ __('app.studio_name') }}</span>
                         </div>
                     </a>
 

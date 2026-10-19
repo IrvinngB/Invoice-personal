@@ -198,7 +198,7 @@ return [
     'invoice_sequence' => 'Invoices Sequence', 'quote_sequence' => 'Quotes Sequence', 'credit_notes' => 'Credit Notes',
     'prefix_optional' => 'Prefix (Optional)', 'digits' => 'Digits', 'next_number' => 'Next #',
     'pdf_template' => 'PDF Template', 'paper_size' => 'Paper Size', 'default_language' => 'Default Language',
-    'template_modern' => 'Modern', 'template_emerald' => 'Emerald (Irvin Benitez Style)', 'template_classic' => 'Classic Formal', 'template_minimal' => 'Minimalist',
+    'template_modern' => 'Modern', 'template_emerald' => 'Emerald', 'template_classic' => 'Classic Formal', 'template_minimal' => 'Minimalist',
     'save_profile_changes' => 'Save All Profile Changes', 'backups_exports' => 'Data Safety, Backups & Accountant Exports',
     'backups_exports_subtitle' => 'Single-click SQLite database snapshots, JSON export, and period tax spreadsheets.',
     'download_snapshot' => 'Download Database Snapshot (.sqlite)', 'download_snapshot_description' => 'Atomic snapshot of the entire SQLite database file containing all your records, invoices, and audit logs.',
@@ -392,4 +392,5 @@ return [
     'theme_scale_compact' => 'Compact',
     'theme_scale_normal' => 'Normal',
     'theme_scale_large' => 'Large',
+    'signature_missing' => 'No signature uploaded yet',
 ];

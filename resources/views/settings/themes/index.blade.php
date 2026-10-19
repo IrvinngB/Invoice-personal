@@ -9,7 +9,10 @@
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{{ __('app.themes_heading') }}</h1>
             <p class="text-sm text-slate-500 dark:text-slate-400">{{ __('app.themes_subtitle') }}</p>
         </div>
-        <a href="{{ route('settings.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white whitespace-nowrap">&larr; {{ __('app.settings') }}</a>
+        <div class="flex flex-col items-end gap-2">
+            <a href="{{ route('settings.themes.create') }}" class="px-4 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap transition">+ {{ __('app.theme_new') }}</a>
+            <a href="{{ route('settings.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white whitespace-nowrap">&larr; {{ __('app.settings') }}</a>
+        </div>
     </div>
 
     <div class="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">

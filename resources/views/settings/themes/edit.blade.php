@@ -55,6 +55,17 @@
             @if($theme->exists) @method('PUT') @endif
             <input type="hidden" name="base" value="{{ $theme->base }}">
 
+            @unless($theme->exists)
+                <div>
+                    <label class="{{ $labelCls }}">{{ __('app.theme_based_on') }}</label>
+                    <select class="{{ $field }}" onchange="window.location = '{{ route('settings.themes.create') }}?base=' + this.value">
+                        @foreach(\App\Services\PdfService::SUPPORTED_TEMPLATES as $preset)
+                            <option value="{{ $preset }}" @selected($theme->base === $preset)>{{ __("app.template_{$preset}") }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endunless
+
             <div>
                 <label class="{{ $labelCls }}">{{ __('app.theme_name') }} <span class="text-rose-500">*</span></label>
                 <input type="text" name="name" x-model="form.name" required maxlength="80" class="{{ $field }}">

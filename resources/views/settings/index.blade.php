@@ -9,6 +9,15 @@
         <p class="text-sm text-slate-500 dark:text-slate-400">{{ __('app.settings_subtitle') }}</p>
     </div>
 
+    <!-- Invoice Themes entry point -->
+    <a href="{{ route('settings.themes.index') }}" class="flex items-center justify-between gap-4 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:border-blue-400 transition group">
+        <div>
+            <div class="text-sm font-bold text-slate-900 dark:text-white">{{ __('app.themes_heading') }}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400">{{ __('app.themes_subtitle') }}</div>
+        </div>
+        <span class="px-4 py-2 text-xs font-semibold rounded-xl bg-blue-600 group-hover:bg-blue-700 text-white whitespace-nowrap transition">{{ __('app.themes_manage') }} &rarr;</span>
+    </a>
+
     <!-- Main Settings Form -->
     <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
@@ -94,8 +103,8 @@
                     <div class="flex items-center space-x-4">
                         @if($profile->signature_path && file_exists(public_path($profile->signature_path)))
                             <img src="{{ asset($profile->signature_path) }}" class="h-10 w-auto max-w-[120px] rounded-lg border border-slate-200 p-1 bg-white">
-                        @elseif(file_exists(public_path('images/signature-accent.svg')))
-                            <img src="{{ asset('images/signature-accent.svg') }}" class="h-8 w-auto max-w-[100px] opacity-70 p-1 bg-white border border-slate-100 rounded">
+                        @else
+                            <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 border border-dashed border-amber-400 rounded-lg px-2 py-1.5">{{ __('app.signature_missing') }}</span>
                         @endif
                         <input type="file" name="signature" accept="image/*"
                             class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
