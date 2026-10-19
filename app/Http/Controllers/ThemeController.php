@@ -78,7 +78,12 @@ class ThemeController extends Controller
         $locale = in_array($request->query('locale'), ['en', 'es'], true) ? $request->query('locale') : app()->getLocale();
 
         $profile = BusinessProfile::current();
-        $tokens = $pdfService->previewTheme($base, $request->query());
+        $query = $request->query();
+        $query['labels'] = ThemeTokens::labelsFromForm(
+            is_array($query['labels'] ?? null) ? $query['labels'] : [],
+            is_array($query['labels_blank'] ?? null) ? $query['labels_blank'] : [],
+        );
+        $tokens = $pdfService->previewTheme($base, $query);
         $pdf = $pdfService->generate(SampleInvoiceFactory::make($profile, $locale), $profile, $base, $tokens);
 
         return $pdf->stream('theme-preview.pdf');
@@ -95,9 +100,10 @@ class ThemeController extends Controller
             'name' => $validated['name'],
             'base' => $validated['base'],
             // Unchecked checkboxes are absent from the request, so default the toggle explicitly.
-            'overrides' => ThemeTokens::sanitize(
-                array_merge($validated, ['uppercase_labels' => $request->boolean('uppercase_labels')])
-            ),
+            'overrides' => ThemeTokens::sanitize(array_merge($validated, [
+                'uppercase_labels' => $request->boolean('uppercase_labels'),
+                'labels' => ThemeTokens::labelsFromForm($validated['labels'] ?? [], $validated['labels_blank'] ?? []),
+            ])),
         ];
     }
 
@@ -124,6 +130,9 @@ class ThemeController extends Controller
             'scale' => $sanitized['scale'] ?? 'normal',
             'uppercase_labels' => $theme['uppercase_labels'],
             'show' => $theme['show'],
+            // Editor state: custom text per label, and which ones are blanked out.
+            'labels' => collect(ThemeTokens::labelKeys())->mapWithKeys(fn ($k) => [$k => ($theme['labels'][$k] ?? '')])->all(),
+            'labels_blank' => collect(ThemeTokens::labelKeys())->mapWithKeys(fn ($k) => [$k => (($theme['labels'][$k] ?? null) === '')])->all(),
         ];
     }
 }

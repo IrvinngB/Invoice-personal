@@ -31,6 +31,10 @@
                 scale: this.form.scale, uppercase_labels: this.form.uppercase_labels ? 1 : 0,
             });
             Object.entries(this.form.show).forEach(([key, on]) => p.append(`show[${key}]`, on ? 1 : 0));
+            Object.entries(this.form.labels).forEach(([key, text]) => {
+                if (this.form.labels_blank[key]) p.append(`labels_blank[${key}]`, 1);
+                else if (text.trim() !== '') p.append(`labels[${key}]`, text);
+            });
             this.src = '{{ route('settings.themes.preview') }}?' + p.toString();
         },
         refresh() { clearTimeout(this.timer); this.timer = setTimeout(() => this.build(), 350); },
@@ -102,6 +106,9 @@
                 <div>
                     <div class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ __('app.theme_show_title') }}</div>
                     <p class="text-[10px] text-slate-400">{{ __('app.theme_show_help') }}</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">{{ __('app.theme_logo_hint') }}
+                        <a href="{{ route('settings.index') }}#logo" target="_blank" class="font-semibold text-blue-600 hover:underline">{{ __('app.theme_logo_link') }} &rarr;</a>
+                    </p>
                 </div>
                 @foreach(\App\Services\ThemeTokens::SHOW_GROUPS as $group => $elements)
                     <div>
@@ -118,6 +125,34 @@
                     </div>
                 @endforeach
             </div>
+
+            <details class="pt-3 border-t border-slate-100 dark:border-slate-800 group">
+                <summary class="cursor-pointer select-none text-xs font-bold text-slate-700 dark:text-slate-200">{{ __('app.theme_labels_title') }}</summary>
+                <p class="text-[10px] text-slate-400 mt-1 mb-3">{{ __('app.theme_labels_help') }}</p>
+                <div class="space-y-4">
+                    @foreach(\App\Services\ThemeTokens::LABEL_GROUPS as $group => $keys)
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">{{ __("app.theme_label_group_{$group}") }}</div>
+                            <div class="space-y-2">
+                                @foreach($keys as $key)
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 mb-0.5">{{ __("invoice.{$key}") }}</div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" name="labels[{{ $key }}]" x-model="form.labels.{{ $key }}" maxlength="{{ \App\Services\ThemeTokens::LABEL_MAX_LENGTH }}"
+                                                :disabled="form.labels_blank.{{ $key }}" placeholder="{{ __("invoice.{$key}") }}"
+                                                class="flex-1 min-w-0 px-2.5 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white disabled:opacity-40">
+                                            <label class="inline-flex items-center text-[10px] text-slate-500 whitespace-nowrap cursor-pointer">
+                                                <input type="checkbox" name="labels_blank[{{ $key }}]" value="1" x-model="form.labels_blank.{{ $key }}" class="rounded border-slate-300 text-blue-600 mr-1">
+                                                {{ __('app.theme_label_blank') }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </details>
 
             <button type="submit" class="w-full px-4 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition">{{ __('app.save') }}</button>
         </form>

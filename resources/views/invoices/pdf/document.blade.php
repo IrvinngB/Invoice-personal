@@ -33,7 +33,7 @@
 
     @if($notes)
         <div style="margin-top: 22pt;">
-            <div class="label">{{ $ctx->t('notes') }}</div>
+            @if($ctx->t('notes') !== '')<div class="label">{{ $ctx->t('notes') }}</div>@endif
             <div class="party-detail">{!! nl2br(e($notes)) !!}</div>
         </div>
     @endif

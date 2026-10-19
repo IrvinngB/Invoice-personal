@@ -25,6 +25,48 @@ class ThemeTokens
         'footer' => ['notes', 'footer'],
     ];
 
+    public const LABEL_MAX_LENGTH = 40;
+
+    /** Texts a theme can rename or blank out (keys of the invoice lang files), grouped for the editor. */
+    public const LABEL_GROUPS = [
+        'document' => ['invoice', 'quote', 'credit_note'],
+        'parties' => ['billed_to', 'ship_to', 'attention', 'tax_id'],
+        'dates' => ['issue_date', 'due_date', 'currency', 'payment_terms', 'reference'],
+        'table' => ['description', 'qty', 'price', 'tax', 'amount'],
+        'totals' => ['subtotal', 'discount', 'shipping_fee', 'total', 'amount_paid', 'balance_due'],
+        'payment' => ['payment_instructions', 'bank', 'account_name', 'iban', 'swift_bic', 'paypal', 'payment_link', 'scan_to_pay'],
+        'other' => ['notes', 'authorized_signature', 'thank_you'],
+    ];
+
+    /** @return list<string> */
+    public static function labelKeys(): array
+    {
+        return array_merge(...array_values(self::LABEL_GROUPS));
+    }
+
+    /**
+     * Turn the editor's two inputs into the stored shape: key => custom text,
+     * where an empty string means "show the value with no label at all".
+     * An empty text box without the "no label" flag simply keeps the default.
+     *
+     * @param array<string, mixed> $texts
+     * @param array<string, mixed> $blank
+     * @return array<string, string>
+     */
+    public static function labelsFromForm(array $texts, array $blank): array
+    {
+        $labels = [];
+        foreach (self::labelKeys() as $key) {
+            if (filter_var($blank[$key] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+                $labels[$key] = '';
+            } elseif (is_scalar($texts[$key] ?? null) && trim((string) $texts[$key]) !== '') {
+                $labels[$key] = (string) $texts[$key];
+            }
+        }
+
+        return $labels;
+    }
+
     /** @return list<string> */
     public static function showKeys(): array
     {
@@ -44,6 +86,10 @@ class ThemeTokens
             'uppercase_labels' => ['nullable', 'boolean'],
             'show' => ['nullable', 'array'],
             'show.*' => ['nullable', 'boolean'],
+            'labels' => ['nullable', 'array'],
+            'labels.*' => ['nullable', 'string', 'max:' . self::LABEL_MAX_LENGTH],
+            'labels_blank' => ['nullable', 'array'],
+            'labels_blank.*' => ['nullable', 'boolean'],
         ];
     }
 
@@ -78,6 +124,14 @@ class ThemeTokens
                 }
             }
         }
+        if (isset($input['labels']) && is_array($input['labels'])) {
+            foreach (self::labelKeys() as $key) {
+                if (array_key_exists($key, $input['labels']) && is_scalar($input['labels'][$key])) {
+                    $text = preg_replace('/[\x00-\x1F\x7F]/u', '', (string) $input['labels'][$key]) ?? '';
+                    $out['labels'][$key] = mb_substr(trim($text), 0, self::LABEL_MAX_LENGTH);
+                }
+            }
+        }
 
         return $out;
     }
@@ -102,6 +156,9 @@ class ThemeTokens
         }
         if (isset($overrides['show'])) {
             $theme['show'] = array_merge($theme['show'] ?? array_fill_keys(self::showKeys(), true), $overrides['show']);
+        }
+        if (isset($overrides['labels'])) {
+            $theme['labels'] = array_merge($theme['labels'] ?? [], $overrides['labels']);
         }
         if (isset($overrides['scale'])) {
             $factor = self::SCALES[$overrides['scale']];

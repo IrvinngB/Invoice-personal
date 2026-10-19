@@ -260,6 +260,100 @@ class InvoiceThemeTest extends TestCase
         $this->get(route('settings.themes.preview', ['base' => 'modern', 'show' => ['seller_tax_id' => '0']]))->assertOk();
     }
 
+    public function test_labels_from_form_resolves_default_custom_and_blank(): void
+    {
+        $labels = ThemeTokens::labelsFromForm(
+            ['tax_id' => 'RUC', 'billed_to' => '   ', 'bank' => 'ignored when blank', 'nope' => 'x'],
+            ['bank' => '1', 'iban' => '0'],
+        );
+
+        $this->assertSame(['tax_id' => 'RUC', 'bank' => ''], $labels, 'whitespace and unflagged empties keep the default');
+    }
+
+    public function test_label_sanitising_whitelists_keys_strips_control_chars_and_caps_length(): void
+    {
+        $clean = ThemeTokens::sanitize(['labels' => [
+            'tax_id' => "  RU\x00C\n ",
+            'total' => str_repeat('x', 100),
+            'notes' => '',
+            'unknown_key' => 'x',
+            'bank' => ['array'],
+        ]]);
+
+        $this->assertSame('RUC', $clean['labels']['tax_id']);
+        $this->assertSame(ThemeTokens::LABEL_MAX_LENGTH, mb_strlen($clean['labels']['total']));
+        $this->assertSame('', $clean['labels']['notes'], 'empty string is kept: it means no label');
+        $this->assertArrayNotHasKey('unknown_key', $clean['labels']);
+        $this->assertArrayNotHasKey('bank', $clean['labels']);
+    }
+
+    public function test_a_theme_can_rename_a_label_and_blank_another_while_keeping_the_value(): void
+    {
+        $profile = BusinessProfile::current();
+        $profile->update(['tax_id' => 'SELLER-RUC-123']);
+        $invoice = $this->createInvoice();
+
+        $default = InvoiceTheme::create(['name' => 'Default', 'base' => 'modern', 'overrides' => []]);
+        $html = app(PdfService::class)->html($invoice, $profile->fresh(), $default->key());
+        $this->assertStringContainsString('NIF / RUC: SELLER-RUC-123', $html);
+
+        $renamed = InvoiceTheme::create(['name' => 'Renamed', 'base' => 'modern', 'overrides' => ['labels' => ['tax_id' => 'RUC', 'invoice' => 'RECIBO']]]);
+        $html = app(PdfService::class)->html($invoice, $profile->fresh(), $renamed->key());
+        $this->assertStringContainsString('RUC: SELLER-RUC-123', $html);
+        $this->assertStringNotContainsString('NIF / RUC', $html);
+        $this->assertStringContainsString('RECIBO', $html);
+
+        $blank = InvoiceTheme::create(['name' => 'Blank', 'base' => 'modern', 'overrides' => ['labels' => ['tax_id' => '', 'billed_to' => '']]]);
+        $html = app(PdfService::class)->html($invoice, $profile->fresh(), $blank->key());
+        $this->assertStringContainsString('SELLER-RUC-123', $html, 'the field is still printed');
+        $this->assertStringNotContainsString('NIF / RUC', $html);
+        $this->assertStringNotContainsString(': SELLER-RUC-123', $html, 'and without a dangling colon');
+        $this->assertStringNotContainsString('Facturado a', $html);
+        $this->assertStringNotContainsString('<div class="label"></div>', $html, 'no empty heading left behind');
+    }
+
+    public function test_custom_labels_are_html_escaped_in_the_document(): void
+    {
+        $theme = InvoiceTheme::create(['name' => 'Xss', 'base' => 'modern', 'overrides' => ['labels' => ['total' => '<script>alert(1)</script>']]]);
+        $html = app(PdfService::class)->html($this->createInvoice(), BusinessProfile::current(), $theme->key());
+
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
+        $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
+    }
+
+    public function test_store_persists_labels_from_the_two_form_inputs(): void
+    {
+        $this->post(route('settings.themes.store'), [
+            'name' => 'Labels', 'base' => 'modern',
+            'labels' => ['tax_id' => 'RUC', 'billed_to' => '', 'bank' => 'whatever'],
+            'labels_blank' => ['bank' => '1'],
+        ])->assertRedirect();
+
+        $this->assertSame(['tax_id' => 'RUC', 'bank' => ''], InvoiceTheme::firstOrFail()->overrides['labels']);
+    }
+
+    public function test_store_rejects_labels_longer_than_the_limit(): void
+    {
+        $this->post(route('settings.themes.store'), [
+            'name' => 'Long', 'base' => 'modern', 'labels' => ['tax_id' => str_repeat('x', 41)],
+        ])->assertSessionHasErrors('labels.tax_id');
+        $this->assertSame(0, InvoiceTheme::count());
+    }
+
+    public function test_editor_prefills_custom_and_blank_labels_and_preview_accepts_them(): void
+    {
+        BusinessProfile::current();
+        $theme = InvoiceTheme::create(['name' => 'L', 'base' => 'modern', 'overrides' => ['labels' => ['tax_id' => 'RUC', 'bank' => '']]]);
+
+        $page = $this->get(route('settings.themes.edit', $theme))->assertOk();
+        $page->assertSee('tax_id\\u0022:\\u0022RUC', false);
+        $page->assertSee('name="labels_blank[bank]"', false);
+        $page->assertSee('settings#logo', false);
+
+        $this->get(route('settings.themes.preview', ['base' => 'modern', 'labels' => ['tax_id' => 'RUC'], 'labels_blank' => ['bank' => '1']]))->assertOk();
+        $this->get(route('settings.themes.preview', ['base' => 'modern', 'labels' => 'garbage', 'labels_blank' => 'garbage']))->assertOk();
+    }
+
     private function createInvoice(array $attributes = []): Invoice
     {
         BusinessProfile::current();

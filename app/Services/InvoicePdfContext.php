@@ -29,9 +29,26 @@ class InvoicePdfContext
         return $this->theme['show'][$element] ?? true;
     }
 
+    /**
+     * Translated text, unless the theme renamed it. A custom label may be the
+     * empty string, meaning "print the value without a label".
+     */
     public function t(string $key, array $replace = []): string
     {
+        $custom = $this->theme['labels'][$key] ?? null;
+        if ($custom !== null) {
+            return $custom;
+        }
+
         return __("invoice.{$key}", $replace, $this->locale);
+    }
+
+    /** "Label: " in front of an inline value, or nothing when the label was blanked out. */
+    public function prefix(string $key): string
+    {
+        $label = $this->t($key);
+
+        return $label === '' ? '' : $label . ': ';
     }
 
     public function money(int $cents): string

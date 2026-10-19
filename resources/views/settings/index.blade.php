@@ -81,7 +81,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <!-- Logo Upload -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.business_logo') }}</label>
+                    <label id="logo" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.business_logo') }}</label>
                     <div class="flex items-center space-x-4">
                         @if($profile->logo_path && file_exists(public_path($profile->logo_path)))
                             <img src="{{ asset($profile->logo_path) }}" class="h-12 w-auto max-w-[120px] rounded-lg border border-slate-200 p-1 bg-white">
