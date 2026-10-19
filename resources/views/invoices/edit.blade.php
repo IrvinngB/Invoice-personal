@@ -49,6 +49,7 @@
         </div>
 
         <div class="flex items-center space-x-3">
+            @include('invoices.partials.preview-button')
             <a href="{{ route('invoices.show', $invoice) }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
                 {{ __('app.cancel') }}
             </a>
@@ -61,9 +62,12 @@
         </div>
     </div>
 
-    <form id="invoiceForm" method="POST" action="{{ route('invoices.update', $invoice) }}" @keydown.window.prevent.ctrl.s="submitForm()" @keydown.window.prevent.meta.s="submitForm()">
+    <form id="invoiceForm" method="POST" action="{{ route('invoices.update', $invoice) }}" @input="refreshPreview()" @change="refreshPreview()" @keydown.window.prevent.ctrl.s="submitForm()" @keydown.window.prevent.meta.s="submitForm()">
         @csrf
         @method('PUT')
+        {{-- Not used by update(); they let the live preview title and number the document correctly. --}}
+        <input type="hidden" name="type" value="{{ $invoice->type }}">
+        <input type="hidden" name="invoice_number" value="{{ $invoice->invoice_number }}">
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left 2 Cols: Form Content -->
@@ -304,15 +308,19 @@
             </div>
         </div>
     </form>
+
+    @include('invoices.partials.preview-drawer')
 </div>
 @endsection
 
 @push('scripts')
+@include('invoices.partials.preview-script')
 <script>
 function invoiceBuilder(config) {
     return {
         clients: config.clients || [],
         catalogItems: config.catalogItems || [],
+        ...invoicePreview(),
         form: {
             client_id: config.initialClientId || '',
             currency: config.defaultCurrency || 'USD',
@@ -459,6 +467,7 @@ function invoiceBuilder(config) {
                 tax: Math.round(taxTotal * 100) / 100,
                 total: Math.round(total * 100) / 100,
             };
+            this.refreshPreview();
         },
 
         formatMoney(amount) {

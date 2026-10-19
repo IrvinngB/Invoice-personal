@@ -39,10 +39,7 @@
         </div>
 
         <div class="flex items-center space-x-3">
-            <button type="button" @click="togglePreview()" :class="preview.open ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'" class="px-4 py-2 rounded-xl text-xs font-semibold border transition inline-flex items-center">
-                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                {{ __('app.preview_document') }}
-            </button>
+            @include('invoices.partials.preview-button')
             <a href="{{ route('invoices.index') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
                 {{ __('app.cancel') }}
             </a>
@@ -396,30 +393,12 @@
         </div>
     </form>
 
-    <!-- Live PDF preview drawer -->
-    <aside x-show="preview.open" x-cloak
-        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
-        @keydown.escape.window="preview.open = false"
-        class="fixed top-16 right-0 bottom-0 z-30 w-full md:w-[44rem] max-w-full flex flex-col bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-            <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white">{{ __('app.preview_live') }}</h3>
-                <span x-show="preview.loading" class="text-[11px] text-slate-400">{{ __('app.preview_updating') }}</span>
-            </div>
-            <button type="button" @click="preview.open = false" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="{{ __('app.preview_close') }}">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div class="relative flex-1 bg-slate-100 dark:bg-slate-950">
-            <iframe x-show="preview.url" :src="preview.url ? preview.url + '#toolbar=0&navpanes=0&view=FitH' : ''" class="absolute inset-0 w-full h-full" title="{{ __('app.preview_live') }}"></iframe>
-            <div x-show="preview.error" class="absolute inset-x-4 top-4 p-3 rounded-xl bg-amber-50 text-amber-800 text-xs border border-amber-200">{{ __('app.preview_failed') }}</div>
-        </div>
-    </aside>
+    @include('invoices.partials.preview-drawer')
 </div>
 @endsection
 
 @push('scripts')
+@include('invoices.partials.preview-script')
 <script>
 function invoiceBuilder(config) {
     return {
@@ -447,7 +426,7 @@ function invoiceBuilder(config) {
             { key: 1, description: '', quantity: 1, unit: 'hours', unit_price: 0, discount_percent: 0, tax_rate_percent: 0 }
         ],
         totals: { subtotal: 0, discount: 0, tax: 0, total: 0 },
-        preview: { open: false, loading: false, error: false, url: null, timer: null, controller: null },
+        ...invoicePreview(),
 
         init() {
             if (config.sourceInvoice) {
@@ -607,41 +586,6 @@ function invoiceBuilder(config) {
                 total: Math.round(total * 100) / 100,
             };
             this.refreshPreview();
-        },
-
-        togglePreview() {
-            this.preview.open = !this.preview.open;
-            if (this.preview.open) this.refreshPreview(true);
-        },
-
-        refreshPreview(immediate = false) {
-            if (!this.preview.open) return;
-            clearTimeout(this.preview.timer);
-            this.preview.timer = setTimeout(() => this.loadPreview(), immediate ? 0 : 600);
-        },
-
-        async loadPreview() {
-            this.preview.controller?.abort();
-            const controller = new AbortController();
-            this.preview.controller = controller;
-            this.preview.loading = true;
-            this.preview.error = false;
-            try {
-                const res = await fetch('{{ route('invoices.preview-draft') }}', {
-                    method: 'POST',
-                    body: new FormData(document.getElementById('invoiceForm')),
-                    signal: controller.signal,
-                });
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const url = URL.createObjectURL(await res.blob());
-                const previous = this.preview.url;
-                this.preview.url = url;
-                if (previous) URL.revokeObjectURL(previous);
-            } catch (e) {
-                if (e.name !== 'AbortError') this.preview.error = true;
-            } finally {
-                if (this.preview.controller === controller) this.preview.loading = false;
-            }
         },
 
         formatMoney(amount) {

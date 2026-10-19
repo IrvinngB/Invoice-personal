@@ -137,6 +137,43 @@ class DraftInvoicePreviewTest extends TestCase
         $this->assertSame(0, BusinessProfile::count());
     }
 
+    public function test_edit_screen_exposes_the_same_preview_panel(): void
+    {
+        BusinessProfile::current();
+        $client = Client::create(['name' => 'Ana Cliente']);
+        $invoice = Invoice::create([
+            'invoice_number' => 'INV-EDIT-1', 'type' => 'quote', 'status' => 'draft', 'client_id' => $client->id,
+            'issue_date' => '2026-10-18', 'due_date' => '2026-11-01', 'currency' => 'USD', 'locale' => 'es', 'pdf_template' => 'modern',
+        ]);
+        $invoice->items()->create(['description' => 'Servicio', 'quantity' => 1, 'unit' => 'h', 'unit_price_cents' => 1000, 'total_cents' => 1000]);
+
+        $this->get(route('invoices.edit', $invoice))
+            ->assertOk()
+            ->assertSee(route('invoices.preview-draft'), false)
+            ->assertSee('togglePreview()', false)
+            ->assertSee('name="type" value="quote"', false)
+            ->assertSee('name="invoice_number" value="INV-EDIT-1"', false)
+            ->assertSee("data.delete('_method')", false);
+    }
+
+    public function test_a_spoofed_put_would_never_reach_the_preview_endpoint(): void
+    {
+        BusinessProfile::current();
+
+        // This is why the shared script strips `_method` from the edit form before posting.
+        $this->post(route('invoices.preview-draft'), $this->payload(['_method' => 'PUT']))->assertNotFound();
+        $this->post(route('invoices.preview-draft'), $this->payload())->assertOk();
+    }
+
+    public function test_draft_type_and_number_come_from_the_form_so_quotes_are_titled_correctly(): void
+    {
+        $invoice = app(DraftInvoiceFactory::class)->make($this->payload(['type' => 'quote', 'invoice_number' => 'EST-0007']), BusinessProfile::current());
+        $html = app(PdfService::class)->html($invoice, BusinessProfile::current(), 'modern');
+
+        $this->assertStringContainsString('EST-0007', $html);
+        $this->assertStringContainsString(__('invoice.quote', [], 'es'), $html);
+    }
+
     public function test_create_screen_exposes_the_preview_button_and_endpoint(): void
     {
         BusinessProfile::current();
