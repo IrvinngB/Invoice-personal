@@ -47,6 +47,8 @@ return [
     'attention' => 'Attn.',
     'payment' => 'Payment',
     'currency_terms' => 'Currency & Terms',
+    'payment_terms' => 'Terms',
+    'currency' => 'Currency',
     'rate' => 'Rate',
     'payment_due_within_days' => 'Payment due within :days days',
     'tax_included' => 'Incl.',

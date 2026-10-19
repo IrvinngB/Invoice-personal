@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AuditLog;
 use App\Models\BusinessProfile;
+use App\Services\PdfService;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -78,10 +79,10 @@ class InvoicePreviewTest extends TestCase
         $invoice = $this->createInvoice(['locale' => 'es']);
         $profile = BusinessProfile::current();
         $layoutMarkers = [
-            'classic' => "Times New Roman",
-            'emerald' => '#2E7A42',
-            'minimal' => 'letter-spacing: -0.5px',
-            'modern' => 'status-badge',
+            'classic' => "font-family: 'Times'",
+            'emerald' => '#1f7a4d',
+            'minimal' => '#111111',
+            'modern' => '#2563eb',
         ];
 
         foreach ($layoutMarkers as $template => $marker) {
@@ -92,15 +93,7 @@ class InvoicePreviewTest extends TestCase
             $response->assertOk();
             $this->assertStringContainsString('inline', (string) $response->headers->get('content-disposition'), $template);
 
-            $html = view("invoices.pdf.{$template}", [
-                'invoice' => $freshInvoice,
-                'profile' => $profile,
-                'client' => $freshInvoice->client,
-                'items' => $freshInvoice->items,
-                'payments' => $freshInvoice->payments,
-                'qrCodeSvg' => null,
-                'locale' => $freshInvoice->locale,
-            ])->render();
+            $html = app(PdfService::class)->html($freshInvoice, BusinessProfile::current(), $template);
 
             $this->assertStringContainsString('FACTURA', $html, $template);
             $this->assertStringContainsString('18 de octubre de 2026', $html, $template);
@@ -124,38 +117,18 @@ class InvoicePreviewTest extends TestCase
 
     public function test_signature_is_omitted_by_default_and_renders_when_enabled(): void
     {
-        $profile = BusinessProfile::current();
         $invoice = $this->createInvoice(['pdf_template' => 'emerald', 'locale' => 'es']);
 
         // Default: signature is omitted
-        $defaultHtml = view('invoices.pdf.emerald', [
-            'invoice' => $invoice,
-            'profile' => $profile,
-            'client' => $invoice->client,
-            'items' => $invoice->items,
-            'payments' => $invoice->payments,
-            'qrCodeSvg' => null,
-            'locale' => 'es',
-            'showSignature' => false,
-            'signaturePath' => null,
-        ])->render();
+        $defaultHtml = app(PdfService::class)->html($invoice, BusinessProfile::current(), 'emerald');
 
-        $this->assertStringNotContainsString('<div class="signature-box">', $defaultHtml);
+        $this->assertStringNotContainsString('class="signature-img"', $defaultHtml);
 
-        // When showSignature is enabled
-        $enabledHtml = view('invoices.pdf.emerald', [
-            'invoice' => $invoice,
-            'profile' => $profile,
-            'client' => $invoice->client,
-            'items' => $invoice->items,
-            'payments' => $invoice->payments,
-            'qrCodeSvg' => null,
-            'locale' => 'es',
-            'showSignature' => true,
-            'signaturePath' => null,
-        ])->render();
+        // When show_signature is enabled on the invoice
+        $invoice->update(['show_signature' => true]);
+        $enabledHtml = app(PdfService::class)->html($invoice->fresh(), BusinessProfile::current(), 'emerald');
 
-        $this->assertStringContainsString('<div class="signature-box">', $enabledHtml);
+        $this->assertStringContainsString('class="signature-img"', $enabledHtml);
     }
 
     private function createInvoice(array $attributes = []): Invoice

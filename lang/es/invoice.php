@@ -47,6 +47,8 @@ return [
     'attention' => 'A la atención de',
     'payment' => 'Pago',
     'currency_terms' => 'Moneda y condiciones',
+    'payment_terms' => 'Condiciones',
+    'currency' => 'Moneda',
     'rate' => 'Tipo de cambio',
     'payment_due_within_days' => 'Pago dentro de :days días',
     'tax_included' => 'Incl.',

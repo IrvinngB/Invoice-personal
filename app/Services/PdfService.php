@@ -18,19 +18,26 @@ class PdfService
     }
 
     /**
-     * Generate DomPDF instance for the invoice.
+     * Design tokens for a preset (see config/invoice_themes.php).
      */
-    public function generate(Invoice $invoice, ?BusinessProfile $profile = null, ?string $templateOverride = null)
+    public function theme(string $template): array
+    {
+        return config("invoice_themes.presets.{$template}") ?? config('invoice_themes.presets.modern');
+    }
+
+    /**
+     * Resolve template, locale and payment QR into the view-model the layout renders.
+     */
+    public function context(Invoice $invoice, ?BusinessProfile $profile = null, ?string $templateOverride = null): InvoicePdfContext
     {
         $profile ??= BusinessProfile::current();
         $template = $templateOverride ?: ($invoice->pdf_template ?: ($profile->default_template ?: 'modern'));
         if (!$this->supportsTemplate($template)) {
             $template = 'modern';
         }
-        $pageSize = strtolower($invoice->page_size ?: ($profile->default_page_size ?: 'a4'));
         $locale = $invoice->locale ?: ($profile->default_locale ?: 'en');
 
-        // Payment QR Code (if payment link or bank details available)
+        // Payment QR Code (if payment link available)
         $qrCodeDataUri = null;
         $qrPayload = $invoice->payment_link ?: $profile->payment_link;
         if (!empty($qrPayload)) {
@@ -47,26 +54,33 @@ class PdfService
             }
         }
 
-        // View mapping
-        $viewName = "invoices.pdf.{$template}";
-        if (!view()->exists($viewName)) {
-            $viewName = 'invoices.pdf.modern';
-        }
+        return new InvoicePdfContext(
+            invoice: $invoice,
+            profile: $profile,
+            locale: $locale,
+            theme: $this->theme($template),
+            showSignature: (bool) ($invoice->show_signature ?? $profile->show_signature ?? false),
+            qrCodeUri: $qrCodeDataUri,
+        );
+    }
 
-        $showSignature = $invoice->show_signature ?? $profile->show_signature ?? false;
-        $signaturePath = $profile->signature_path ?? null;
+    /**
+     * Rendered HTML of the document (what DomPDF receives).
+     */
+    public function html(Invoice $invoice, ?BusinessProfile $profile = null, ?string $templateOverride = null): string
+    {
+        return view('invoices.pdf.document', ['ctx' => $this->context($invoice, $profile, $templateOverride)])->render();
+    }
 
-        $pdf = Pdf::loadView($viewName, [
-            'invoice' => $invoice,
-            'profile' => $profile,
-            'client' => $invoice->client,
-            'items' => $invoice->items,
-            'payments' => $invoice->payments,
-            'qrCodeSvg' => $qrCodeDataUri,
-            'locale' => $locale,
-            'showSignature' => $showSignature,
-            'signaturePath' => $signaturePath,
-        ]);
+    /**
+     * Generate DomPDF instance for the invoice.
+     */
+    public function generate(Invoice $invoice, ?BusinessProfile $profile = null, ?string $templateOverride = null)
+    {
+        $profile ??= BusinessProfile::current();
+        $pageSize = strtolower($invoice->page_size ?: ($profile->default_page_size ?: 'a4'));
+
+        $pdf = Pdf::loadView('invoices.pdf.document', ['ctx' => $this->context($invoice, $profile, $templateOverride)]);
 
         $pdf->setPaper($pageSize === 'letter' ? 'letter' : 'a4', 'portrait');
         $pdf->setOption([

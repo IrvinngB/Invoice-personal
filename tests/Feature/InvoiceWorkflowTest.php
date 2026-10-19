@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\InvoiceMail;
 use App\Models\BusinessProfile;
+use App\Services\PdfService;
 use App\Models\AuditLog;
 use App\Models\CatalogItem;
 use App\Models\Client;
@@ -192,15 +193,7 @@ class InvoiceWorkflowTest extends TestCase
         $this->assertStringContainsString('1 de noviembre de 2026', $mail->render());
         $this->assertStringContainsString('$1.234,56', $mail->render());
 
-        $html = view('invoices.pdf.modern', [
-            'invoice' => $invoice,
-            'profile' => BusinessProfile::current(),
-            'client' => $client,
-            'items' => $invoice->items,
-            'payments' => $invoice->payments,
-            'qrCodeSvg' => null,
-            'locale' => $invoice->locale,
-        ])->render();
+        $html = app(PdfService::class)->html($invoice, BusinessProfile::current(), 'modern');
 
         $this->assertStringContainsString('FACTURA', $html);
         $this->assertStringContainsString('18 de octubre de 2026', $html);

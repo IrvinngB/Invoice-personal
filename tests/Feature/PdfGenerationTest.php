@@ -90,15 +90,7 @@ class PdfGenerationTest extends TestCase
         $invoice->recalculateTotals()->refresh();
 
         foreach (['classic', 'emerald', 'minimal', 'modern'] as $template) {
-            $html = view("invoices.pdf.{$template}", [
-                'invoice' => $invoice,
-                'profile' => $profile,
-                'client' => $client,
-                'items' => $invoice->items,
-                'payments' => $invoice->payments,
-                'qrCodeSvg' => null,
-                'locale' => $invoice->locale,
-            ])->render();
+            $html = app(PdfService::class)->html($invoice, BusinessProfile::current(), $template);
 
             $this->assertStringContainsString('FACTURA', $html, $template);
             $this->assertStringContainsString('18 de octubre de 2026', $html, $template);
@@ -141,14 +133,6 @@ class PdfGenerationTest extends TestCase
 
     private function renderPdf(string $template, Invoice $invoice, BusinessProfile $profile, Client $client): string
     {
-        return view("invoices.pdf.{$template}", [
-            'invoice' => $invoice,
-            'profile' => $profile,
-            'client' => $client,
-            'items' => $invoice->items,
-            'payments' => $invoice->payments,
-            'qrCodeSvg' => null,
-            'locale' => $invoice->locale,
-        ])->render();
+        return app(PdfService::class)->html($invoice, BusinessProfile::current(), $template);
     }
 }
