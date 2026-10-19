@@ -30,12 +30,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.business_name') }} <span class="text-rose-500">*</span></label>
-                    <input type="text" name="business_name" value="{{ old('business_name', $profile->business_name) }}" required
+                    <input type="text" name="business_name" placeholder="Acme Studio LLC" value="{{ old('business_name', $profile->business_name) }}" required
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.owner_name') }}</label>
-                    <input type="text" name="owner_name" value="{{ old('owner_name', $profile->owner_name) }}"
+                    <input type="text" name="owner_name" placeholder="John Doe" value="{{ old('owner_name', $profile->owner_name) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
             </div>
@@ -43,17 +43,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.tax_id') }}</label>
-                    <input type="text" name="tax_id" value="{{ old('tax_id', $profile->tax_id) }}"
+                    <input type="text" name="tax_id" placeholder="0-000-000-0" value="{{ old('tax_id', $profile->tax_id) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono">
                 </div>
                 <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.business_email') }}</label>
-                    <input type="email" name="email" value="{{ old('email', $profile->email) }}"
+                    <input type="email" name="email" placeholder="hello@example.com" value="{{ old('email', $profile->email) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.phone') }}</label>
-                    <input type="text" name="phone" value="{{ old('phone', $profile->phone) }}"
+                    <input type="text" name="phone" placeholder="+1 555 000 0000" value="{{ old('phone', $profile->phone) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
             </div>
@@ -61,19 +61,19 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.website_url') }}</label>
-                    <input type="url" name="website" value="{{ old('website', $profile->website) }}" placeholder="https://..."
+                    <input type="url" name="website" value="{{ old('website', $profile->website) }}" placeholder="https://www.example.com"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.timezone') }}</label>
-                    <input type="text" name="timezone" value="{{ old('timezone', $profile->timezone) }}" required
+                    <input type="text" name="timezone" placeholder="America/New_York" value="{{ old('timezone', $profile->timezone) }}" required
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.business_address') }}</label>
-                <textarea name="address" rows="3"
+                <textarea name="address" placeholder="123 Main Street&#10;City, Country" rows="3"
                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">{{ old('address', $profile->address) }}</textarea>
             </div>
 
@@ -121,12 +121,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.bank_name') }}</label>
-                    <input type="text" name="bank_name" value="{{ old('bank_name', $profile->bank_name) }}"
+                    <input type="text" name="bank_name" placeholder="Example Bank" value="{{ old('bank_name', $profile->bank_name) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.account_holder_name') }}</label>
-                    <input type="text" name="bank_account_name" value="{{ old('bank_account_name', $profile->bank_account_name) }}"
+                    <input type="text" name="bank_account_name" placeholder="John Doe" value="{{ old('bank_account_name', $profile->bank_account_name) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
             </div>
@@ -134,12 +134,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.account_number') }}</label>
-                    <input type="text" name="bank_iban" value="{{ old('bank_iban', $profile->bank_iban) }}"
+                    <input type="text" name="bank_iban" placeholder="0000-0000-0000-0000" value="{{ old('bank_iban', $profile->bank_iban) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.swift_code') }}</label>
-                    <input type="text" name="bank_swift" value="{{ old('bank_swift', $profile->bank_swift) }}"
+                    <input type="text" name="bank_swift" placeholder="EXAMPLEXXX" value="{{ old('bank_swift', $profile->bank_swift) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono">
                 </div>
             </div>
@@ -147,7 +147,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.paypal_email') }}</label>
-                    <input type="email" name="paypal_email" value="{{ old('paypal_email', $profile->paypal_email) }}"
+                    <input type="email" name="paypal_email" placeholder="payments@example.com" value="{{ old('paypal_email', $profile->paypal_email) }}"
                         class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
@@ -175,7 +175,7 @@
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">{{ __('app.invoice_sequence') }}</span>
                     <div>
                         <label class="block text-[10px] text-slate-400">{{ __('app.prefix_optional') }}</label>
-                        <input type="text" name="invoice_prefix" value="{{ old('invoice_prefix', $profile->invoice_prefix) }}"
+                        <input type="text" name="invoice_prefix" placeholder="INV-2026-" value="{{ old('invoice_prefix', $profile->invoice_prefix) }}"
                             class="w-full px-2 py-1 text-xs rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -197,7 +197,7 @@
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">{{ __('app.quote_sequence') }}</span>
                     <div>
                         <label class="block text-[10px] text-slate-400">{{ __('app.prefix_optional') }}</label>
-                        <input type="text" name="quote_prefix" value="{{ old('quote_prefix', $profile->quote_prefix) }}"
+                        <input type="text" name="quote_prefix" placeholder="QUO-2026-" value="{{ old('quote_prefix', $profile->quote_prefix) }}"
                             class="w-full px-2 py-1 text-xs rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -219,7 +219,7 @@
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">{{ __('app.credit_notes') }}</span>
                     <div>
                         <label class="block text-[10px] text-slate-400">{{ __('app.prefix_optional') }}</label>
-                        <input type="text" name="credit_note_prefix" value="{{ old('credit_note_prefix', $profile->credit_note_prefix) }}"
+                        <input type="text" name="credit_note_prefix" placeholder="CN-2026-" value="{{ old('credit_note_prefix', $profile->credit_note_prefix) }}"
                             class="w-full px-2 py-1 text-xs rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
                     </div>
                     <div class="grid grid-cols-2 gap-2">

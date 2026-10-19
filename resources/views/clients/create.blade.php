@@ -17,12 +17,12 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.primary_contact_name') }} <span class="text-rose-500">*</span></label>
-                <input type="text" name="name" value="{{ old('name') }}" required
+                <input type="text" name="name" placeholder="John Doe" value="{{ old('name') }}" required
                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.company_organization') }}</label>
-                <input type="text" name="company" value="{{ old('company') }}"
+                <input type="text" name="company" placeholder="Example Co." value="{{ old('company') }}"
                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
             </div>
         </div>
@@ -30,24 +30,24 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.tax_id') }}</label>
-                <input type="text" name="tax_id" value="{{ old('tax_id') }}"
+                <input type="text" name="tax_id" placeholder="0-000-000-0" value="{{ old('tax_id') }}"
                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.email_address') }}</label>
-                <input type="email" name="email" value="{{ old('email') }}"
+                <input type="email" name="email" placeholder="hello@example.com" value="{{ old('email') }}"
                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.phone_number') }}</label>
-                <input type="text" name="phone" value="{{ old('phone') }}"
+                <input type="text" name="phone" placeholder="+1 555 000 0000" value="{{ old('phone') }}"
                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">
             </div>
         </div>
 
         <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{{ __('app.billing_address') }}</label>
-            <textarea name="billing_address" rows="3"
+            <textarea name="billing_address" placeholder="123 Main Street&#10;City, Country" rows="3"
                 class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">{{ old('billing_address') }}</textarea>
         </div>
 
