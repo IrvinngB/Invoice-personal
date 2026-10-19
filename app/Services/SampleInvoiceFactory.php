@@ -73,6 +73,7 @@ class SampleInvoiceFactory
             'tax_inclusive' => false,
             'notes' => $es ? 'Gracias por su preferencia.' : 'Thank you for your business.',
             'show_signature' => (bool) $profile->show_signature,
+            'show_payment_instructions' => (bool) $profile->show_payment_instructions,
         ]);
         $invoice->setRelation('client', $client);
         $invoice->setRelation('items', $items);

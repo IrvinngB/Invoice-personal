@@ -19,6 +19,7 @@ class InvoicePdfContext
         public readonly array $theme,
         public readonly bool $showSignature = false,
         public readonly ?string $qrCodeUri = null,
+        public readonly bool $showPaymentInstructions = true,
     ) {
     }
 
@@ -99,6 +100,10 @@ class InvoicePdfContext
 
     public function hasPaymentBlock(): bool
     {
+        if (!$this->showPaymentInstructions) {
+            return false;
+        }
+
         return $this->profile->bank_iban
             || $this->profile->bank_name
             || $this->profile->paypal_email

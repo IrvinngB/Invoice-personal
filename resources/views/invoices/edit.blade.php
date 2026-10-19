@@ -25,6 +25,7 @@
         locale: '{{ $invoice->locale }}',
         tax_inclusive: {{ $invoice->tax_inclusive ? 'true' : 'false' }},
         show_signature: {{ ($invoice->show_signature ?? $profile->show_signature) ? 'true' : 'false' }},
+        show_payment_instructions: {{ ($invoice->show_payment_instructions ?? $profile->show_payment_instructions) ? 'true' : 'false' }},
         shipping_fee_cents: {{ $invoice->shipping_fee_cents }},
         items: {{ Js::from($invoice->items) }}
     }
@@ -286,9 +287,16 @@
                                 <span>{{ __('app.prices_tax_inclusive') }}</span>
                             </label>
                             <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                                <input type="hidden" name="show_signature" value="0">
                                 <input type="checkbox" name="show_signature" x-model="form.show_signature" value="1"
                                     class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 mr-2">
                                 <span>{{ __('app.show_signature') }}</span>
+                            </label>
+                            <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                                <input type="hidden" name="show_payment_instructions" value="0">
+                                <input type="checkbox" name="show_payment_instructions" x-model="form.show_payment_instructions" value="1"
+                                    class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mr-2">
+                                <span>{{ __('app.show_payment_instructions') }}</span>
                             </label>
                         </div>
                     </div>
@@ -317,7 +325,8 @@ function invoiceBuilder(config) {
             pdf_template: 'modern',
             page_size: 'a4',
             locale: 'en',
-            show_signature: false
+            show_signature: false,
+            show_payment_instructions: true
         },
         items: [],
         totals: { subtotal: 0, discount: 0, tax: 0, total: 0 },
@@ -336,6 +345,7 @@ function invoiceBuilder(config) {
                 this.form.locale = src.locale;
                 this.form.tax_inclusive = !!src.tax_inclusive;
                 this.form.show_signature = !!src.show_signature;
+                this.form.show_payment_instructions = src.show_payment_instructions !== false;
                 this.form.shipping_fee = (src.shipping_fee_cents / 100) || 0;
 
                 if (src.items && src.items.length > 0) {

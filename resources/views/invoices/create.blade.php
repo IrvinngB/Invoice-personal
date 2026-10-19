@@ -16,6 +16,7 @@
     defaultPageSize: '{{ $profile->default_page_size ?: "letter" }}',
     defaultLocale: '{{ $profile->default_locale ?: "es" }}',
     defaultShowSignature: {{ $profile->show_signature ? 'true' : 'false' }},
+    defaultShowPaymentInstructions: {{ $profile->show_payment_instructions ? 'true' : 'false' }},
     initialClientId: '{{ $selectedClientId ?: '' }}',
     sourceInvoice: {{ Js::from($sourceInvoice) }}
 })" class="space-y-6">
@@ -371,9 +372,16 @@
                                 <span>{{ __('app.prices_tax_inclusive') }}</span>
                             </label>
                             <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                                <input type="hidden" name="show_signature" value="0">
                                 <input type="checkbox" name="show_signature" x-model="form.show_signature" value="1"
                                     class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 mr-2">
                                 <span>{{ __('app.show_signature') }}</span>
+                            </label>
+                            <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                                <input type="hidden" name="show_payment_instructions" value="0">
+                                <input type="checkbox" name="show_payment_instructions" x-model="form.show_payment_instructions" value="1"
+                                    class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mr-2">
+                                <span>{{ __('app.show_payment_instructions') }}</span>
                             </label>
                         </div>
                     </div>
@@ -432,7 +440,8 @@ function invoiceBuilder(config) {
             pdf_template: config.defaultTemplate || 'modern',
             page_size: config.defaultPageSize || 'letter',
             locale: config.defaultLocale || 'es',
-            show_signature: config.defaultShowSignature || false
+            show_signature: config.defaultShowSignature || false,
+            show_payment_instructions: config.defaultShowPaymentInstructions !== false
         },
         items: [
             { key: 1, description: '', quantity: 1, unit: 'hours', unit_price: 0, discount_percent: 0, tax_rate_percent: 0 }

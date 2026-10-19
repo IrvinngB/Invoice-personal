@@ -21,6 +21,7 @@ class BusinessProfile extends Model
         'credit_note_number_digits' => 'integer',
         'next_credit_note_number' => 'integer',
         'show_signature' => 'boolean',
+        'show_payment_instructions' => 'boolean',
         'smtp_port' => 'integer',
     ];
 
@@ -44,6 +45,7 @@ class BusinessProfile extends Model
             'default_notes' => 'Gracias por su preferencia.',
             'default_footer' => null,
             'show_signature' => false,
+            'show_payment_instructions' => true,
             'bank_name' => null,
             'bank_account_name' => null,
             'bank_iban' => null,

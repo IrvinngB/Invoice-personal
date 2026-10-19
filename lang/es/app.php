@@ -398,4 +398,6 @@ return [
     'preview_failed' => 'No se pudo generar la vista previa. Revisá el formulario e intentá de nuevo.',
     'preview_close' => 'Cerrar vista previa',
     'preview_live' => 'Vista previa en vivo',
+    'show_payment_instructions' => 'Mostrar instrucciones de pago',
+    'show_payment_instructions_description' => 'Imprime los datos bancarios y el QR de pago en las facturas. Cada factura puede cambiarlo.',
 ];

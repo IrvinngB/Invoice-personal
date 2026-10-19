@@ -398,4 +398,6 @@ return [
     'preview_failed' => 'Could not generate the preview. Check the form and try again.',
     'preview_close' => 'Close preview',
     'preview_live' => 'Live preview',
+    'show_payment_instructions' => 'Show payment instructions',
+    'show_payment_instructions_description' => 'Print the bank details and payment QR on invoices. Each invoice can override this.',
 ];

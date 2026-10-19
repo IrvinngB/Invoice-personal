@@ -102,6 +102,7 @@ class InvoiceController extends Controller
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
             'show_signature' => 'nullable|boolean',
+            'show_payment_instructions' => 'nullable|boolean',
             'items' => 'required|array|min:1',
             'items.*.description' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:0.0001',
@@ -189,6 +190,7 @@ class InvoiceController extends Controller
                 'page_size' => $request->page_size,
                 'locale' => $request->locale,
                 'show_signature' => $request->has('show_signature') ? $request->boolean('show_signature') : null,
+                'show_payment_instructions' => $request->has('show_payment_instructions') ? $request->boolean('show_payment_instructions') : null,
             ]);
 
             foreach ($request->items as $index => $itemData) {
@@ -263,6 +265,7 @@ class InvoiceController extends Controller
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
             'show_signature' => 'nullable|boolean',
+            'show_payment_instructions' => 'nullable|boolean',
             'items' => 'required|array|min:1',
             'items.*.description' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:0.0001',
@@ -290,6 +293,7 @@ class InvoiceController extends Controller
                 'page_size' => $request->page_size,
                 'locale' => $request->locale,
                 'show_signature' => $request->has('show_signature') ? $request->boolean('show_signature') : null,
+                'show_payment_instructions' => $request->has('show_payment_instructions') ? $request->boolean('show_payment_instructions') : null,
             ]);
 
             // Replace line items

@@ -53,6 +53,7 @@ class SettingsController extends Controller
             'default_locale' => 'nullable|in:en,es',
             'timezone' => 'required|string|timezone',
             'show_signature' => 'nullable|boolean',
+            'show_payment_instructions' => 'nullable|boolean',
             'signature' => 'nullable|image|max:2048',
         ]);
 
@@ -79,6 +80,7 @@ class SettingsController extends Controller
         }
 
         $validated['show_signature'] = $request->boolean('show_signature', false);
+        $validated['show_payment_instructions'] = $request->boolean('show_payment_instructions', false);
         $validated['default_currency'] = strtoupper($validated['default_currency']);
         $validated['default_locale'] = $validated['default_locale'] ?? $profile->default_locale ?? 'es';
         $validated['default_tax_rate_bps'] = isset($validated['default_tax_rate_percent']) ? (int) round($validated['default_tax_rate_percent'] * 100) : 0;

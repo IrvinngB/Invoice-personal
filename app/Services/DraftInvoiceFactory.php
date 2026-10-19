@@ -83,6 +83,9 @@ class DraftInvoiceFactory
             'payment_instructions' => $this->text($data['payment_instructions'] ?? null),
             'payment_link' => $this->text($data['payment_link'] ?? null),
             'page_size' => in_array($data['page_size'] ?? null, ['a4', 'letter'], true) ? $data['page_size'] : null,
+            'show_payment_instructions' => array_key_exists('show_payment_instructions', $data)
+                ? filter_var($data['show_payment_instructions'], FILTER_VALIDATE_BOOLEAN)
+                : null,
             'show_signature' => array_key_exists('show_signature', $data)
                 ? filter_var($data['show_signature'], FILTER_VALIDATE_BOOLEAN)
                 : null,

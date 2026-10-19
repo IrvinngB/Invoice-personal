@@ -105,6 +105,7 @@ class PdfService
             theme: $themeTokens ?? $this->theme($template),
             showSignature: (bool) ($invoice->show_signature ?? $profile->show_signature ?? false),
             qrCodeUri: $qrCodeDataUri,
+            showPaymentInstructions: (bool) ($invoice->show_payment_instructions ?? $profile->show_payment_instructions ?? true),
         );
     }
 

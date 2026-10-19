@@ -116,7 +116,14 @@
 
         <!-- Bank Details Card -->
         <div class="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">2. {{ __('app.payment_instructions') }}</h3>
+            <div class="flex items-start justify-between gap-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">2. {{ __('app.payment_instructions') }}</h3>
+                <label class="inline-flex items-center cursor-pointer shrink-0">
+                    <input type="checkbox" name="show_payment_instructions" value="1" {{ old('show_payment_instructions', $profile->show_payment_instructions) ? 'checked' : '' }} class="rounded border-slate-300 shadow-sm focus:ring-blue-500 text-blue-600">
+                    <span class="ml-2 text-xs font-medium text-slate-700 dark:text-slate-300">{{ __('app.show_payment_instructions') }}</span>
+                </label>
+            </div>
+            <p class="text-[10px] text-slate-400 -mt-2">{{ __('app.show_payment_instructions_description') }}</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
