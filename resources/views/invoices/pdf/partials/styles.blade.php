@@ -145,6 +145,13 @@
     .card-row strong { color: {{ $th['ink'] }}; }
     .qr { width: 66pt; height: 66pt; }
     .qr-caption { font-size: {{ $sz['label'] }}pt; color: {{ $th['muted'] }}; margin-top: 2pt; text-align: center; }
+    .signature-placeholder {
+        border: 0.8pt dashed {{ $th['muted'] }};
+        color: {{ $th['muted'] }};
+        font-size: {{ $sz['small'] }}pt;
+        text-align: center;
+        padding: 14pt 10pt;
+    }
     .signature-img { max-height: 40pt; max-width: 140pt; }
     .signature-line { border-top: 0.6pt solid {{ $th['line'] }}; margin-top: 3pt; padding-top: 3pt; font-size: {{ $sz['label'] }}pt; color: {{ $th['muted'] }}; text-transform: {{ $label }}; letter-spacing: 0.6pt; }
 

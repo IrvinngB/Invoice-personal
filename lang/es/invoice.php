@@ -73,5 +73,6 @@ return [
     'mail_amount_due' => 'Importe pendiente',
     'mail_pay_online' => 'Pagar en línea ahora',
     'mail_best_regards' => 'Saludos cordiales,',
+    'signature_placeholder' => 'Subí tu firma en Configuración',
     'authorized_signature' => 'Firma Autorizada',
 ];

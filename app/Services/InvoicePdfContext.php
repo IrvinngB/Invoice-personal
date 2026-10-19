@@ -63,8 +63,16 @@ class InvoicePdfContext
             return null;
         }
 
-        return $this->existingPublicPath($this->profile->signature_path)
-            ?? $this->existingPublicPath('images/signature-accent.svg');
+        return $this->existingPublicPath($this->profile->signature_path);
+    }
+
+    /**
+     * Signature is switched on but none was uploaded: print a visible reminder
+     * instead of a stock signature that could be mistaken for the user's own.
+     */
+    public function showSignaturePlaceholder(): bool
+    {
+        return $this->showSignature && $this->signaturePath() === null;
     }
 
     /**

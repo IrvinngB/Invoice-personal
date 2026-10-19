@@ -128,7 +128,24 @@ class InvoicePreviewTest extends TestCase
         $invoice->update(['show_signature' => true]);
         $enabledHtml = app(PdfService::class)->html($invoice->fresh(), BusinessProfile::current(), 'emerald');
 
-        $this->assertStringContainsString('class="signature-img"', $enabledHtml);
+        $this->assertStringNotContainsString('class="signature-img"', $enabledHtml, 'no stock signature without an upload');
+        $this->assertStringContainsString('class="signature-placeholder"', $enabledHtml);
+
+        // With an uploaded signature the real image replaces the placeholder
+        $dir = public_path('uploads/signatures');
+        @mkdir($dir, 0755, true);
+        $file = $dir . '/zz_test_signature.png';
+        imagepng(imagecreatetruecolor(40, 20), $file);
+        try {
+            $profile = BusinessProfile::current();
+            $profile->signature_path = 'uploads/signatures/zz_test_signature.png';
+            $uploadedHtml = app(PdfService::class)->html($invoice->fresh(), $profile, 'emerald');
+        } finally {
+            unlink($file);
+        }
+
+        $this->assertStringContainsString('class="signature-img"', $uploadedHtml);
+        $this->assertStringNotContainsString('class="signature-placeholder"', $uploadedHtml);
     }
 
     private function createInvoice(array $attributes = []): Invoice

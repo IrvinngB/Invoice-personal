@@ -33,4 +33,9 @@
         <img src="{{ $sig }}" class="signature-img" alt="">
         <div class="signature-line">{{ $ctx->t('authorized_signature') }}</div>
     </div>
+@elseif($ctx->showSignaturePlaceholder())
+    <div style="margin-top: 22pt;">
+        <div class="signature-placeholder">{{ $ctx->t('signature_placeholder') }}</div>
+        <div class="signature-line">{{ $ctx->t('authorized_signature') }}</div>
+    </div>
 @endif
