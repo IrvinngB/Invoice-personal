@@ -68,15 +68,39 @@
                     class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">{{ old('address', $profile->address) }}</textarea>
             </div>
 
-            <!-- Logo Upload -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.business_logo') }}</label>
-                <div class="flex items-center space-x-4">
-                    @if($profile->logo_path && file_exists(public_path($profile->logo_path)))
-                        <img src="{{ asset($profile->logo_path) }}" class="h-12 w-auto max-w-[120px] rounded-lg border border-slate-200 p-1 bg-white">
-                    @endif
-                    <input type="file" name="logo" accept="image/*"
-                        class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            <!-- Logo & Signature Upload -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <!-- Logo Upload -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{{ __('app.business_logo') }}</label>
+                    <div class="flex items-center space-x-4">
+                        @if($profile->logo_path && file_exists(public_path($profile->logo_path)))
+                            <img src="{{ asset($profile->logo_path) }}" class="h-12 w-auto max-w-[120px] rounded-lg border border-slate-200 p-1 bg-white">
+                        @endif
+                        <input type="file" name="logo" accept="image/*"
+                            class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                </div>
+
+                <!-- Signature Upload & Option -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">{{ __('app.business_signature') }}</label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="show_signature" value="1" {{ old('show_signature', $profile->show_signature) ? 'checked' : '' }} class="rounded border-slate-300 text-emerald-600 shadow-sm focus:ring-emerald-500">
+                            <span class="ml-2 text-xs font-medium text-slate-700 dark:text-slate-300">{{ __('app.show_signature') }}</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        @if($profile->signature_path && file_exists(public_path($profile->signature_path)))
+                            <img src="{{ asset($profile->signature_path) }}" class="h-10 w-auto max-w-[120px] rounded-lg border border-slate-200 p-1 bg-white">
+                        @elseif(file_exists(public_path('images/signature-accent.svg')))
+                            <img src="{{ asset('images/signature-accent.svg') }}" class="h-8 w-auto max-w-[100px] opacity-70 p-1 bg-white border border-slate-100 rounded">
+                        @endif
+                        <input type="file" name="signature" accept="image/*"
+                            class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">{{ __('app.show_signature_description') }}</p>
                 </div>
             </div>
         </div>

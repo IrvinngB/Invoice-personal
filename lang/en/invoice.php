@@ -71,4 +71,5 @@ return [
     'mail_amount_due' => 'Amount Due',
     'mail_pay_online' => 'Pay Online Now',
     'mail_best_regards' => 'Best regards,',
+    'authorized_signature' => 'Authorized Signature',
 ];

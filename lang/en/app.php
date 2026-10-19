@@ -344,4 +344,9 @@ return [
     'payment_method_other' => 'Other',
     'payment_email_description' => 'The PDF invoice will be automatically generated and attached to this email. You can configure custom SMTP credentials in Studio Settings.',
     'void_reason_placeholder' => 'e.g. Cancelled by client, duplicated error',
+    'show_signature' => 'Show signature on documents',
+    'show_signature_description' => 'Include graphic signature on generated invoice footers',
+    'business_signature' => 'Business / authorized signature',
+    'preview_styles' => 'Invoice styles',
+    'preview_in_style' => 'Preview in :style style',
 ];

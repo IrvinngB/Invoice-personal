@@ -99,6 +99,7 @@ class InvoiceController extends Controller
             'pdf_template' => 'required|in:modern,classic,minimal,emerald',
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
+            'show_signature' => 'nullable|boolean',
             'items' => 'required|array|min:1',
             'items.*.description' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:0.0001',
@@ -185,6 +186,7 @@ class InvoiceController extends Controller
                 'pdf_template' => $request->pdf_template,
                 'page_size' => $request->page_size,
                 'locale' => $request->locale,
+                'show_signature' => $request->has('show_signature') ? $request->boolean('show_signature') : null,
             ]);
 
             foreach ($request->items as $index => $itemData) {
@@ -258,6 +260,7 @@ class InvoiceController extends Controller
             'pdf_template' => 'required|in:modern,classic,minimal,emerald',
             'page_size' => 'required|in:a4,letter',
             'locale' => 'required|in:en,es',
+            'show_signature' => 'nullable|boolean',
             'items' => 'required|array|min:1',
             'items.*.description' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:0.0001',
@@ -284,6 +287,7 @@ class InvoiceController extends Controller
                 'pdf_template' => $request->pdf_template,
                 'page_size' => $request->page_size,
                 'locale' => $request->locale,
+                'show_signature' => $request->has('show_signature') ? $request->boolean('show_signature') : null,
             ]);
 
             // Replace line items
@@ -367,16 +371,17 @@ class InvoiceController extends Controller
         return $pdf->stream($filename);
     }
 
-    public function preview(Invoice $invoice, PdfService $pdfService)
+    public function preview(Request $request, Invoice $invoice, PdfService $pdfService)
     {
-        abort_unless($pdfService->supportsTemplate($invoice->pdf_template), 404);
+        $template = $request->query('template', $invoice->pdf_template);
+        abort_unless($pdfService->supportsTemplate($template), 404);
 
         // Avoid PdfService::generate()'s normal first-or-create profile fallback:
         // preview is strictly read-only, even in an incompletely initialized database.
         $profile = BusinessProfile::query()->first();
         abort_unless($profile, 404);
 
-        $pdf = $pdfService->generate($invoice, $profile);
+        $pdf = $pdfService->generate($invoice, $profile, $template);
 
         return $pdf->stream($pdfService->getFilename($invoice));
     }

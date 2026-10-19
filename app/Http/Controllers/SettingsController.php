@@ -50,6 +50,8 @@ class SettingsController extends Controller
             'default_page_size' => 'required|in:a4,letter',
             'default_locale' => 'nullable|in:en,es',
             'timezone' => 'required|string|timezone',
+            'show_signature' => 'nullable|boolean',
+            'signature' => 'nullable|image|max:2048',
         ]);
 
         $profile = BusinessProfile::current();
@@ -64,12 +66,23 @@ class SettingsController extends Controller
             $validated['logo_path'] = 'uploads/logos/' . $filename;
         }
 
+        if ($request->hasFile('signature')) {
+            $sigDir = public_path('uploads/signatures');
+            if (!File::isDirectory($sigDir)) {
+                File::makeDirectory($sigDir, 0755, true);
+            }
+            $filename = 'sig_' . time() . '.' . $request->file('signature')->getClientOriginalExtension();
+            $request->file('signature')->move($sigDir, $filename);
+            $validated['signature_path'] = 'uploads/signatures/' . $filename;
+        }
+
+        $validated['show_signature'] = $request->boolean('show_signature', false);
         $validated['default_currency'] = strtoupper($validated['default_currency']);
         $validated['default_locale'] = $validated['default_locale'] ?? $profile->default_locale ?? 'es';
         $validated['default_tax_rate_bps'] = isset($validated['default_tax_rate_percent']) ? (int) round($validated['default_tax_rate_percent'] * 100) : 0;
         $validated['default_tax_inclusive'] = $request->boolean('default_tax_inclusive', false);
 
-        unset($validated['logo'], $validated['default_tax_rate_percent']);
+        unset($validated['logo'], $validated['signature'], $validated['default_tax_rate_percent']);
 
         $profile->update($validated);
 

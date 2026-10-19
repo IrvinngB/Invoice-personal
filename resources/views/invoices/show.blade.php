@@ -3,7 +3,7 @@
 @section('title', $invoice->invoice_number . ' - ' . ($invoice->client->company ?: $invoice->client->name))
 
 @section('content')
-<div x-data="{ paymentModal: false, emailModal: false, voidModal: false }" class="space-y-6">
+<div x-data="{ paymentModal: false, emailModal: false, voidModal: false, previewModal: false, previewStyle: '{{ $invoice->pdf_template }}', stylesMenu: false }" class="space-y-6">
 
     <!-- Top Action Bar -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -40,9 +40,35 @@
 
         <!-- Buttons Toolbar -->
         <div class="flex flex-wrap items-center gap-2">
-            <a href="{{ route('invoices.preview', $invoice) }}" target="_blank" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition flex items-center" aria-label="{{ __('app.preview_invoice') }}">
-                {{ __('app.preview') }}
-            </a>
+            <!-- Preview with Styles Menu -->
+            <div class="relative inline-flex items-center rounded-xl shadow-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <button type="button" @click="previewModal = true" class="px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-l-xl transition flex items-center" aria-label="{{ __('app.preview_invoice') }}">
+                    <svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {{ __('app.preview') }}
+                </button>
+                <div class="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
+                <button type="button" @click="stylesMenu = !stylesMenu" class="px-2 py-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-r-xl transition" title="{{ __('app.preview_styles') }}">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <!-- Styles Dropdown -->
+                <div x-show="stylesMenu" @click.away="stylesMenu = false" x-cloak class="absolute left-0 top-full mt-1.5 w-60 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-1.5 z-30 space-y-0.5">
+                    <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ __('app.preview_styles') }}</div>
+                    @foreach(['emerald' => __('app.template_emerald'), 'modern' => __('app.template_modern'), 'classic' => __('app.template_classic'), 'minimal' => __('app.template_minimal')] as $styleKey => $styleLabel)
+                        <button type="button" @click="previewStyle = '{{ $styleKey }}'; previewModal = true; stylesMenu = false" class="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-700 dark:text-slate-200 transition">
+                            <span>{{ $styleLabel }}</span>
+                            @if($invoice->pdf_template === $styleKey)
+                                <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">Actual</span>
+                            @endif
+                        </button>
+                    @endforeach
+                </div>
+            </div>
 
             <!-- Download PDF -->
             <a href="{{ route('invoices.pdf', $invoice) }}" target="_blank" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition flex items-center">
@@ -490,6 +516,55 @@
                     <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700">{{ __('app.confirm_void') }}</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Interactive Document Preview Modal with Style Switcher -->
+    <div x-show="previewModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6" x-cloak>
+        <div @click.away="previewModal = false" class="max-w-5xl w-full h-[92vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-5 py-3.5 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/90">
+                <div class="flex items-center space-x-3">
+                    <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                            {{ __('app.preview') }}: {{ $invoice->invoice_number }}
+                        </h3>
+                        <p class="text-[11px] text-slate-400">{{ __('app.preview_styles') }}</p>
+                    </div>
+                </div>
+
+                <!-- Style Switcher Tabs -->
+                <div class="flex items-center bg-slate-200 dark:bg-slate-800 p-1 rounded-xl space-x-1">
+                    @foreach(['emerald' => __('app.template_emerald'), 'modern' => __('app.template_modern'), 'classic' => __('app.template_classic'), 'minimal' => __('app.template_minimal')] as $stKey => $stLabel)
+                        <button type="button" @click="previewStyle = '{{ $stKey }}'"
+                            :class="previewStyle === '{{ $stKey }}' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+                            class="px-2.5 py-1 text-xs rounded-lg transition">
+                            {{ $stLabel }}
+                        </button>
+                    @endforeach
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-2">
+                    <a :href="'{{ route('invoices.preview', $invoice) }}?template=' + previewStyle" target="_blank" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center shadow-sm">
+                        <svg class="w-3.5 h-3.5 mr-1 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Nueva pestaña
+                    </a>
+                    <button type="button" @click="previewModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg text-lg leading-none">&times;</button>
+                </div>
+            </div>
+
+            <!-- PDF Viewer Iframe -->
+            <div class="flex-1 bg-slate-100 dark:bg-slate-950 p-2 sm:p-3 overflow-hidden">
+                <iframe :src="'{{ route('invoices.preview', $invoice) }}?template=' + previewStyle" class="w-full h-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white shadow-inner" title="PDF Preview"></iframe>
+            </div>
         </div>
     </div>
 

@@ -25,6 +25,7 @@ class Invoice extends Model
         'total_cents' => 'integer',
         'amount_paid_cents' => 'integer',
         'balance_cents' => 'integer',
+        'show_signature' => 'boolean',
         'finalized_at' => 'datetime',
         'sent_at' => 'datetime',
         'voided_at' => 'datetime',

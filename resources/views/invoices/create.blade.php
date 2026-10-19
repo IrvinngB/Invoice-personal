@@ -15,6 +15,7 @@
     defaultTemplate: '{{ $profile->default_template ?: "modern" }}',
     defaultPageSize: '{{ $profile->default_page_size ?: "letter" }}',
     defaultLocale: '{{ $profile->default_locale ?: "es" }}',
+    defaultShowSignature: {{ $profile->show_signature ? 'true' : 'false' }},
     initialClientId: '{{ $selectedClientId ?: '' }}',
     sourceInvoice: {{ Js::from($sourceInvoice) }}
 })" class="space-y-6">
@@ -359,11 +360,16 @@
                             </div>
                         </div>
 
-                        <div class="pt-2">
+                        <div class="pt-2 flex flex-col space-y-2">
                             <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
                                 <input type="checkbox" name="tax_inclusive" x-model="form.tax_inclusive" @change="recalc()" value="1"
                                     class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mr-2">
                                 <span>{{ __('app.prices_tax_inclusive') }}</span>
+                            </label>
+                            <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                                <input type="checkbox" name="show_signature" x-model="form.show_signature" value="1"
+                                    class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 mr-2">
+                                <span>{{ __('app.show_signature') }}</span>
                             </label>
                         </div>
                     </div>
@@ -400,7 +406,8 @@ function invoiceBuilder(config) {
             payment_link: '',
             pdf_template: config.defaultTemplate || 'modern',
             page_size: config.defaultPageSize || 'letter',
-            locale: config.defaultLocale || 'es'
+            locale: config.defaultLocale || 'es',
+            show_signature: config.defaultShowSignature || false
         },
         items: [
             { key: 1, description: '', quantity: 1, unit: 'hours', unit_price: 0, discount_percent: 0, tax_rate_percent: 0 }

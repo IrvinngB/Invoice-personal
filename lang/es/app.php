@@ -344,4 +344,9 @@ return [
     'payment_method_other' => 'Otro',
     'payment_email_description' => 'La factura PDF se generará automáticamente y se adjuntará a este correo. Podés configurar credenciales SMTP personalizadas en la configuración del estudio.',
     'void_reason_placeholder' => 'p. ej., cancelada por el cliente o error duplicado',
+    'show_signature' => 'Mostrar firma en documentos',
+    'show_signature_description' => 'Incluir la firma al pie de las facturas generadas',
+    'business_signature' => 'Firma comercial / autorizada',
+    'preview_styles' => 'Estilos de factura',
+    'preview_in_style' => 'Previsualizar en estilo :style',
 ];

@@ -20,10 +20,13 @@ class PdfService
     /**
      * Generate DomPDF instance for the invoice.
      */
-    public function generate(Invoice $invoice, ?BusinessProfile $profile = null)
+    public function generate(Invoice $invoice, ?BusinessProfile $profile = null, ?string $templateOverride = null)
     {
         $profile ??= BusinessProfile::current();
-        $template = $invoice->pdf_template ?: ($profile->default_template ?: 'modern');
+        $template = $templateOverride ?: ($invoice->pdf_template ?: ($profile->default_template ?: 'modern'));
+        if (!$this->supportsTemplate($template)) {
+            $template = 'modern';
+        }
         $pageSize = strtolower($invoice->page_size ?: ($profile->default_page_size ?: 'a4'));
         $locale = $invoice->locale ?: ($profile->default_locale ?: 'en');
 
@@ -50,6 +53,9 @@ class PdfService
             $viewName = 'invoices.pdf.modern';
         }
 
+        $showSignature = $invoice->show_signature ?? $profile->show_signature ?? false;
+        $signaturePath = $profile->signature_path ?? null;
+
         $pdf = Pdf::loadView($viewName, [
             'invoice' => $invoice,
             'profile' => $profile,
@@ -58,6 +64,8 @@ class PdfService
             'payments' => $invoice->payments,
             'qrCodeSvg' => $qrCodeDataUri,
             'locale' => $locale,
+            'showSignature' => $showSignature,
+            'signaturePath' => $signaturePath,
         ]);
 
         $pdf->setPaper($pageSize === 'letter' ? 'letter' : 'a4', 'portrait');

@@ -111,6 +111,53 @@ class InvoicePreviewTest extends TestCase
         }
     }
 
+    public function test_preview_supports_template_query_parameter_for_all_styles(): void
+    {
+        $invoice = $this->createInvoice(['pdf_template' => 'modern', 'locale' => 'es']);
+
+        foreach (['emerald', 'classic', 'minimal', 'modern'] as $style) {
+            $response = $this->get(route('invoices.preview', [$invoice, 'template' => $style]));
+            $response->assertOk();
+            $this->assertSame('application/pdf', $response->headers->get('content-type'));
+        }
+    }
+
+    public function test_signature_is_omitted_by_default_and_renders_when_enabled(): void
+    {
+        $profile = BusinessProfile::current();
+        $invoice = $this->createInvoice(['pdf_template' => 'emerald', 'locale' => 'es']);
+
+        // Default: signature is omitted
+        $defaultHtml = view('invoices.pdf.emerald', [
+            'invoice' => $invoice,
+            'profile' => $profile,
+            'client' => $invoice->client,
+            'items' => $invoice->items,
+            'payments' => $invoice->payments,
+            'qrCodeSvg' => null,
+            'locale' => 'es',
+            'showSignature' => false,
+            'signaturePath' => null,
+        ])->render();
+
+        $this->assertStringNotContainsString('<div class="signature-box">', $defaultHtml);
+
+        // When showSignature is enabled
+        $enabledHtml = view('invoices.pdf.emerald', [
+            'invoice' => $invoice,
+            'profile' => $profile,
+            'client' => $invoice->client,
+            'items' => $invoice->items,
+            'payments' => $invoice->payments,
+            'qrCodeSvg' => null,
+            'locale' => 'es',
+            'showSignature' => true,
+            'signaturePath' => null,
+        ])->render();
+
+        $this->assertStringContainsString('<div class="signature-box">', $enabledHtml);
+    }
+
     private function createInvoice(array $attributes = []): Invoice
     {
         BusinessProfile::current();
