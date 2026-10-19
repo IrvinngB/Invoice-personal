@@ -9,6 +9,7 @@ use App\Models\CatalogItem;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Services\DraftInvoiceFactory;
 use App\Services\PdfService;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
@@ -385,6 +386,23 @@ class InvoiceController extends Controller
         $pdf = $pdfService->generate($invoice, $profile, $template);
 
         return $pdf->stream($pdfService->getFilename($invoice));
+    }
+
+    /**
+     * PDF preview of the create form as it stands right now. Strictly read-only:
+     * the invoice is built in memory and never persisted.
+     */
+    public function previewDraft(Request $request, PdfService $pdfService, DraftInvoiceFactory $factory)
+    {
+        $profile = BusinessProfile::query()->first();
+        abort_unless($profile, 404);
+
+        $clientId = $request->input('client_id');
+        $client = is_numeric($clientId) ? Client::find($clientId) : null;
+
+        $invoice = $factory->make($request->all(), $profile, $client);
+
+        return $pdfService->generate($invoice, $profile, $request->input('pdf_template'))->stream('preview.pdf');
     }
 
     public function sendEmail(Request $request, Invoice $invoice, PdfService $pdfService)

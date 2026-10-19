@@ -393,4 +393,9 @@ return [
     'theme_scale_normal' => 'Normal',
     'theme_scale_large' => 'Large',
     'signature_missing' => 'No signature uploaded yet',
+    'preview_document' => 'Preview',
+    'preview_updating' => 'Updating…',
+    'preview_failed' => 'Could not generate the preview. Check the form and try again.',
+    'preview_close' => 'Close preview',
+    'preview_live' => 'Live preview',
 ];

@@ -393,4 +393,9 @@ return [
     'theme_scale_normal' => 'Normal',
     'theme_scale_large' => 'Grande',
     'signature_missing' => 'Todavía no subiste una firma',
+    'preview_document' => 'Vista previa',
+    'preview_updating' => 'Actualizando…',
+    'preview_failed' => 'No se pudo generar la vista previa. Revisá el formulario e intentá de nuevo.',
+    'preview_close' => 'Cerrar vista previa',
+    'preview_live' => 'Vista previa en vivo',
 ];
