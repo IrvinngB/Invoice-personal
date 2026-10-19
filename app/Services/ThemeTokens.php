@@ -17,6 +17,20 @@ class ThemeTokens
     public const RADII = [0, 4, 8, 12];
     public const SCALES = ['compact' => 0.92, 'normal' => 1.0, 'large' => 1.1];
 
+    /** Elements a theme can hide, grouped for the editor. Everything is visible by default. */
+    public const SHOW_GROUPS = [
+        'header' => ['logo', 'seller_owner', 'seller_tax_id', 'seller_address', 'seller_email', 'seller_phone', 'seller_website', 'status'],
+        'client' => ['client_contact', 'client_tax_id', 'client_address', 'client_email', 'client_phone'],
+        'dates' => ['meta_due_date', 'meta_currency'],
+        'footer' => ['notes', 'footer'],
+    ];
+
+    /** @return list<string> */
+    public static function showKeys(): array
+    {
+        return array_merge(...array_values(self::SHOW_GROUPS));
+    }
+
     public static function rules(): array
     {
         return [
@@ -28,6 +42,8 @@ class ThemeTokens
             'radius' => ['nullable', 'in:' . implode(',', self::RADII)],
             'scale' => ['nullable', 'in:' . implode(',', array_keys(self::SCALES))],
             'uppercase_labels' => ['nullable', 'boolean'],
+            'show' => ['nullable', 'array'],
+            'show.*' => ['nullable', 'boolean'],
         ];
     }
 
@@ -55,6 +71,13 @@ class ThemeTokens
         if (array_key_exists('uppercase_labels', $input) && $input['uppercase_labels'] !== null) {
             $out['uppercase_labels'] = filter_var($input['uppercase_labels'], FILTER_VALIDATE_BOOLEAN);
         }
+        if (isset($input['show']) && is_array($input['show'])) {
+            foreach (self::showKeys() as $key) {
+                if (array_key_exists($key, $input['show']) && $input['show'][$key] !== null) {
+                    $out['show'][$key] = filter_var($input['show'][$key], FILTER_VALIDATE_BOOLEAN);
+                }
+            }
+        }
 
         return $out;
     }
@@ -76,6 +99,9 @@ class ThemeTokens
             if (array_key_exists($key, $overrides)) {
                 $theme[$key] = $overrides[$key];
             }
+        }
+        if (isset($overrides['show'])) {
+            $theme['show'] = array_merge($theme['show'] ?? array_fill_keys(self::showKeys(), true), $overrides['show']);
         }
         if (isset($overrides['scale'])) {
             $factor = self::SCALES[$overrides['scale']];

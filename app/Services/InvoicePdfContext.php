@@ -23,6 +23,12 @@ class InvoicePdfContext
     ) {
     }
 
+    /** Whether the active theme shows an element (see ThemeTokens::SHOW_GROUPS). */
+    public function shows(string $element): bool
+    {
+        return $this->theme['show'][$element] ?? true;
+    }
+
     public function t(string $key, array $replace = []): string
     {
         return __("invoice.{$key}", $replace, $this->locale);
@@ -55,7 +61,7 @@ class InvoicePdfContext
 
     public function logoPath(): ?string
     {
-        return $this->existingPublicPath($this->profile->logo_path);
+        return $this->shows('logo') ? $this->existingPublicPath($this->profile->logo_path) : null;
     }
 
     public function signaturePath(): ?string

@@ -123,6 +123,7 @@ class ThemeController extends Controller
             'radius' => $theme['radius'],
             'scale' => $sanitized['scale'] ?? 'normal',
             'uppercase_labels' => $theme['uppercase_labels'],
+            'show' => $theme['show'],
         ];
     }
 }

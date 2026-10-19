@@ -2,12 +2,12 @@
     $profile = $ctx->profile;
     $inline = $inline ?? false;
     $lines = array_values(array_filter([
-        ($profile->owner_name && $profile->owner_name !== $profile->business_name) ? $profile->owner_name : null,
-        $profile->tax_id ? $ctx->t('tax_id') . ': ' . $profile->tax_id : null,
-        $profile->address ? preg_replace('/\s*\R\s*/', ', ', trim($profile->address)) : null,
-        $profile->email,
-        $profile->phone,
-        $profile->website ? preg_replace('#^https?://#', '', $profile->website) : null,
+        ($ctx->shows('seller_owner') && $profile->owner_name && $profile->owner_name !== $profile->business_name) ? $profile->owner_name : null,
+        ($ctx->shows('seller_tax_id') && $profile->tax_id) ? $ctx->t('tax_id') . ': ' . $profile->tax_id : null,
+        ($ctx->shows('seller_address') && $profile->address) ? preg_replace('/\s*\R\s*/', ', ', trim($profile->address)) : null,
+        $ctx->shows('seller_email') ? $profile->email : null,
+        $ctx->shows('seller_phone') ? $profile->phone : null,
+        ($ctx->shows('seller_website') && $profile->website) ? preg_replace('#^https?://#', '', $profile->website) : null,
     ]));
 @endphp
 @if($inline)

@@ -30,10 +30,11 @@
                 table: this.form.table, total: this.form.total, radius: this.form.radius,
                 scale: this.form.scale, uppercase_labels: this.form.uppercase_labels ? 1 : 0,
             });
+            Object.entries(this.form.show).forEach(([key, on]) => p.append(`show[${key}]`, on ? 1 : 0));
             this.src = '{{ route('settings.themes.preview') }}?' + p.toString();
         },
         refresh() { clearTimeout(this.timer); this.timer = setTimeout(() => this.build(), 350); },
-        init() { this.build(); this.$watch('form', () => this.refresh()); }
+        init() { this.build(); this.$watch('form', () => this.refresh(), { deep: true }); }
      }">
 
     <div class="flex items-start justify-between gap-4">
@@ -96,6 +97,27 @@
                 <input type="checkbox" name="uppercase_labels" value="1" x-model="form.uppercase_labels" class="rounded">
                 {{ __('app.theme_uppercase') }}
             </label>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                <div>
+                    <div class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ __('app.theme_show_title') }}</div>
+                    <p class="text-[10px] text-slate-400">{{ __('app.theme_show_help') }}</p>
+                </div>
+                @foreach(\App\Services\ThemeTokens::SHOW_GROUPS as $group => $elements)
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">{{ __("app.theme_group_{$group}") }}</div>
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                            @foreach($elements as $element)
+                                <label class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                                    <input type="hidden" name="show[{{ $element }}]" value="0">
+                                    <input type="checkbox" name="show[{{ $element }}]" value="1" x-model="form.show.{{ $element }}" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mr-2">
+                                    {{ __("app.theme_show_{$element}") }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
 
             <button type="submit" class="w-full px-4 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition">{{ __('app.save') }}</button>
         </form>

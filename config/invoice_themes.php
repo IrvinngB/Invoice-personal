@@ -28,6 +28,7 @@ $base = [
     'table' => 'filled',
     'total' => 'box',
     'uppercase_labels' => true,
+    'show' => array_fill_keys(\App\Services\ThemeTokens::showKeys(), true),
 ];
 
 return [

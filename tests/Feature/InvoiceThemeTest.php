@@ -178,6 +178,88 @@ class InvoiceThemeTest extends TestCase
         $this->get(route('settings.themes.edit', $theme))->assertOk()->assertSee('#ff0000');
     }
 
+    public function test_show_overrides_keep_only_known_elements_as_booleans(): void
+    {
+        $clean = ThemeTokens::sanitize(['show' => ['seller_tax_id' => '0', 'phone_number' => '0', 'status' => 'garbage', 'logo' => '1', 'notes' => null]]);
+
+        $this->assertEqualsCanonicalizing(['seller_tax_id' => false, 'logo' => true, 'status' => false], $clean['show']);
+        $this->assertSame(['show'], array_keys($clean));
+        $this->assertSame([], ThemeTokens::sanitize(['show' => 'nope']));
+    }
+
+    public function test_every_element_is_visible_unless_a_theme_hides_it(): void
+    {
+        $base = config('invoice_themes.presets.modern');
+        $this->assertSame(ThemeTokens::showKeys(), array_keys($base['show']));
+        $this->assertNotContains(false, $base['show']);
+
+        $applied = ThemeTokens::apply($base, ['show' => ['seller_tax_id' => false]]);
+        $this->assertFalse($applied['show']['seller_tax_id']);
+        $this->assertTrue($applied['show']['seller_phone'], 'untouched elements stay visible');
+    }
+
+    public function test_a_theme_can_hide_the_tax_id_phone_and_status_on_the_rendered_document(): void
+    {
+        $profile = BusinessProfile::current();
+        $profile->update(['tax_id' => 'SELLER-RUC-123', 'phone' => '+1 555 000 9999']);
+        $client = Client::create(['name' => 'Ana', 'company' => 'Cliente SA', 'tax_id' => 'CLIENT-RUC-456', 'email' => 'ana@client.test']);
+        $invoice = $this->createInvoice(['client_id' => $client->id, 'status' => 'sent']);
+
+        $visible = InvoiceTheme::create(['name' => 'Full', 'base' => 'modern', 'overrides' => []]);
+        $html = app(PdfService::class)->html($invoice->fresh(), $profile->fresh(), $visible->key());
+        foreach (['SELLER-RUC-123', '+1 555 000 9999', 'CLIENT-RUC-456', 'ana@client.test', 'class="status-pill"'] as $needle) {
+            $this->assertStringContainsString($needle, $html, $needle);
+        }
+
+        $trimmed = InvoiceTheme::create(['name' => 'Lean', 'base' => 'modern', 'overrides' => ['show' => [
+            'seller_tax_id' => false, 'seller_phone' => false, 'client_tax_id' => false, 'client_email' => false, 'status' => false,
+        ]]]);
+        $html = app(PdfService::class)->html($invoice->fresh(), $profile->fresh(), $trimmed->key());
+        foreach (['SELLER-RUC-123', '+1 555 000 9999', 'CLIENT-RUC-456', 'ana@client.test', 'class="status-pill"'] as $needle) {
+            $this->assertStringNotContainsString($needle, $html, $needle);
+        }
+        $this->assertStringContainsString('Cliente SA', $html, 'unrelated content is untouched');
+    }
+
+    public function test_hiding_notes_and_footer_removes_those_sections(): void
+    {
+        $profile = BusinessProfile::current();
+        $invoice = $this->createInvoice(['notes' => 'UNIQUE-NOTE-TEXT']);
+        $theme = InvoiceTheme::create(['name' => 'Bare', 'base' => 'classic', 'overrides' => ['show' => ['notes' => false, 'footer' => false, 'meta_due_date' => false, 'meta_currency' => false]]]);
+
+        $html = app(PdfService::class)->html($invoice, $profile, $theme->key());
+
+        $this->assertStringNotContainsString('UNIQUE-NOTE-TEXT', $html);
+        $this->assertStringNotContainsString('page-footer w-full', $html);
+        $this->assertStringNotContainsString('Fecha de Vencimiento', $html);
+        $this->assertStringNotContainsString('>Moneda<', $html);
+    }
+
+    public function test_store_persists_unchecked_elements_posted_as_hidden_zeros(): void
+    {
+        $this->post(route('settings.themes.store'), [
+            'name' => 'Lean', 'base' => 'modern',
+            'show' => ['seller_tax_id' => '0', 'seller_phone' => '1', 'bogus_key' => '0'],
+        ])->assertRedirect();
+
+        $this->assertSame(
+            ['seller_tax_id' => false, 'seller_phone' => true],
+            InvoiceTheme::firstOrFail()->overrides['show']
+        );
+    }
+
+    public function test_editor_and_preview_reflect_the_saved_visibility(): void
+    {
+        $theme = InvoiceTheme::create(['name' => 'Lean', 'base' => 'modern', 'overrides' => ['show' => ['seller_tax_id' => false]]]);
+        BusinessProfile::current();
+
+        $page = $this->get(route('settings.themes.edit', $theme))->assertOk();
+        $page->assertSee('seller_tax_id\\u0022:false', false); // Js::from encodes quotes as \\u0022
+        $page->assertSee('name="show[seller_phone]"', false);
+
+        $this->get(route('settings.themes.preview', ['base' => 'modern', 'show' => ['seller_tax_id' => '0']]))->assertOk();
+    }
+
     private function createInvoice(array $attributes = []): Invoice
     {
         BusinessProfile::current();

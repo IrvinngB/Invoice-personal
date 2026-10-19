@@ -17,9 +17,11 @@
             <td class="right" style="width: 45%;">
                 <div class="doc-title">{{ $ctx->docTitle() }}</div>
                 <div class="doc-number">{{ $invoice->invoice_number }}</div>
-                <div style="margin-top: 7pt;">
-                    <span class="status-pill" style="background: {{ $status['bg'] }}; color: {{ $status['fg'] }};">{{ $ctx->t('status_' . $invoice->status) }}</span>
-                </div>
+                @if($ctx->shows('status'))
+                    <div style="margin-top: 7pt;">
+                        <span class="status-pill" style="background: {{ $status['bg'] }}; color: {{ $status['fg'] }};">{{ $ctx->t('status_' . $invoice->status) }}</span>
+                    </div>
+                @endif
             </td>
         </tr>
     </table>
@@ -35,7 +37,9 @@
             <td class="right" style="width: 45%; vertical-align: middle;">
                 <div class="doc-title">{{ $ctx->docTitle() }}</div>
                 <div class="doc-number">{{ $invoice->invoice_number }}</div>
-                <div class="biz-meta" style="margin-top: 5pt; text-transform: uppercase; letter-spacing: 0.8pt;">{{ $ctx->t('status_' . $invoice->status) }}</div>
+                @if($ctx->shows('status'))
+                    <div class="biz-meta" style="margin-top: 5pt; text-transform: uppercase; letter-spacing: 0.8pt;">{{ $ctx->t('status_' . $invoice->status) }}</div>
+                @endif
             </td>
         </tr>
     </table>
@@ -63,7 +67,9 @@
             <td class="right" style="width: 40%;">
                 <div class="label">{{ $ctx->docTitle() }}</div>
                 <div class="ink bold" style="font-size: {{ $ctx->theme['size']['total'] }}pt;">{{ $invoice->invoice_number }}</div>
-                <div class="label" style="margin-top: 4pt;">{{ $ctx->t('status_' . $invoice->status) }}</div>
+                @if($ctx->shows('status'))
+                    <div class="label" style="margin-top: 4pt;">{{ $ctx->t('status_' . $invoice->status) }}</div>
+                @endif
             </td>
         </tr>
     </table>

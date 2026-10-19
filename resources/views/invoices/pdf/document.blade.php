@@ -1,7 +1,7 @@
 @php
     $profile = $ctx->profile;
     $invoice = $ctx->invoice;
-    $notes = $invoice->notes ?: $profile->default_notes;
+    $notes = $ctx->shows('notes') ? ($invoice->notes ?: $profile->default_notes) : null;
     $watermark = $ctx->watermark();
 @endphp
 <!DOCTYPE html>
@@ -38,11 +38,13 @@
         </div>
     @endif
 
+    @if($ctx->shows('footer'))
     <table class="page-footer w-full">
         <tr>
             <td>{{ $profile->business_name ?: $profile->owner_name }}@if($profile->default_footer) &nbsp;•&nbsp; {{ preg_replace('/\s*\R\s*/', ' • ', trim($profile->default_footer)) }}@endif</td>
             <td class="right">{{ $ctx->t('thank_you') }}</td>
         </tr>
     </table>
+    @endif
 </body>
 </html>
